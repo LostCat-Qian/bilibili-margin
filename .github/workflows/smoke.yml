@@ -131,6 +131,7 @@ jobs:
         run: |
           node tests/weather-system.mjs
           node tests/weather-offline.mjs
+          SMOKE_OUT=smoke-artifacts/weather-domestic node tests/weather-domestic.mjs
         env:
           SMOKE_OUT: smoke-artifacts/weather-system
       - name: Transparent dynamic glass and undistorted content

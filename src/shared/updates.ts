@@ -1,6 +1,8 @@
 export const UPDATE_PENDING = 'margin:update-pending';
 export const UPDATE_SEEN = 'margin:update-seen';
 export const UPDATE_NOTES = [
+  "国内城市优先直连中央气象台，显示实况和三日预报，标明来源及发布时间。",
+  "缺失的逐小时预报和降水概率不显示；保留断网缓存，不新增定位或浏览器权限。",
   "收藏夹支持移动、复制到其他收藏夹，失败保留原视频，发送中防止重复操作。",
   "修复原站音乐详情与滚动小窗被右栏遮挡，音乐详情圆角跟随设置。",
   "天气并发刷新、同城位置更新和手动重试失败时保留历史缓存与原始采集时间。",

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleWeatherLocation } from '../../src/background/weather-location';
 import { AUTO_LOCATION_TTL, WEATHER_LOCATION_KEY, type WeatherLocationMessage } from '../../src/shared/weather-location';
+// This suite isolates shared-location/cache behavior; the real domestic provider has its own integration tests.
+vi.mock('../../src/content/api/weather-cn', () => ({ chinaWeather: vi.fn(async () => null) }));
 
 const LOC_KEY = 'margin:weather-loc', CACHE_KEY = 'margin:weather-cache';
 const zhuhai = { name: '珠海市', lat: 22.2716, lon: 113.5769, region: '广东省 · 中国' };

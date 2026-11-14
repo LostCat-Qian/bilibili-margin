@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## v0.6.57 · 2026-11-14
+
+- Prefer National Meteorological Center observations and daily forecasts for supported Chinese cities, avoiding a timeout-only experience when the original forecast host is unreachable. Retain the original provider for overseas or unavailable domestic data.
+- Match stations using bundled coordinates, province and city names. Add no browser permissions, geolocation permissions, settings or runtime dependencies.
+- Show the source and observation publication time. Hide unavailable hourly forecasts, precipitation probability and missing observation fields; never display the missing-value sentinel 9999 as weather.
+- Preserve historical cache timestamps and actual forecast dates. Keep the external-services consent gate.
+- Cover direct domestic retrieval, fallback, offline cache, homonymous cities, missing or stale data and privacy boundaries. Public builds exclude the local listening experiment.
+
 ## v0.6.56 · 2026-11-14
 
 - Add native favorite move/copy actions using existing account permissions and CSRF. Update the source only after confirmation, retain failed drafts and prevent duplicate submissions.

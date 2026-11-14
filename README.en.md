@@ -109,7 +109,7 @@ Community advertisement skipping is off by default. When enabled, it queries [Bi
 
 The developer does not operate an analytics or data-collection server. Settings, activity records and custom background images stay on your device; exported backups are yours to store.
 
-Weather requests use `ipwho.is` for an approximate city and Open-Meteo for city search and forecasts. Those services receive the IP, city or coordinates needed for their requests. Bilibili account details, favorites and viewing history are not sent to weather providers. Read the [privacy policy](PRIVACY.md).
+Weather requests use `ipwho.is` for an approximate city. Supported Chinese cities prefer observations and daily forecasts from the National Meteorological Center at `www.nmc.cn`; unavailable hourly forecasts and precipitation probabilities are omitted. Overseas cities or unavailable domestic data use Open-Meteo. Providers receive only the IP, city, station code or coordinates needed for those requests. Bilibili account details, favorites and viewing history are not sent to weather providers. Read the [privacy policy](PRIVACY.md).
 
 MARGIN is an independent open-source project, **not an official Bilibili product and not affiliated with Bilibili**.
 
