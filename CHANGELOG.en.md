@@ -4,6 +4,16 @@
 
 ## Unreleased
 
+## v0.6.58 · 2026-11-15
+
+- Add a listening shortcut to the video-page header with video/danmaku and cover/lyrics views, using the current player, playback position, volume and speed.
+- Automatically enable live audio visualization during playback, with rounded spectrum bars and a smooth waveform view. Reuse the existing background layer and synchronize the home background, intensity and theme settings.
+- Support loaded player captions, local LRC/text imports, synchronized lyrics with seeking, and an adjustable original-video lyric region. Cover loading includes fallback sources and manual retry.
+- Load the listening module on first use. Suspend continuous spectrum drawing while paused, hidden or using reduced motion, and restore the native layout and release audio-analysis resources on exit.
+- Remove the native dynamic-detail dark-theme backdrop that caused an abrupt brightness boundary between the header and MARGIN wallpaper.
+- Hide the native live-room navigation placeholder that could create a white strip and cover MARGIN controls, including placeholders mounted asynchronously.
+- Add header regression coverage using the actual wallpaper layer across the dynamic feed, dynamic details, live rooms and home page, in both themes and scroll positions.
+
 ## v0.6.57 · 2026-11-14
 
 - Prefer National Meteorological Center observations and daily forecasts for supported Chinese cities, avoiding a timeout-only experience when the original forecast host is unreachable. Retain the original provider for overseas or unavailable domestic data.

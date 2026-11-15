@@ -62,6 +62,10 @@ jobs:
           SMOKE_OUT: smoke-artifacts/issues-20261113
       - name: Native charging-video filter, sorting and search
         run: node tests/space-charging.mjs
+      - name: Listening views, live audio analysis and cover recovery
+        run: |
+          SMOKE_OUT=smoke-artifacts/music-mode node tests/music-mode.mjs
+          SMOKE_OUT=smoke-artifacts/music-cover node tests/music-cover.mjs
       - name: Application window navigation
         run: npm run test:app-window
       - name: Native comment locations and both search styles
@@ -115,7 +119,9 @@ jobs:
         env:
           SMOKE_OUT: smoke-artifacts/message-sync
       - name: Transparent header over high-contrast backgrounds
-        run: npm run test:header-surface
+        run: |
+          npm run test:header-surface
+          SMOKE_OUT=smoke-artifacts/native-header node tests/native-header.mjs
         env:
           SMOKE_OUT: smoke-artifacts/header-surface
       - name: Smoke test (offline mocked bilibili)
