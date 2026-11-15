@@ -76,6 +76,14 @@ jobs:
         run: node tests/feed-batches.mjs
         env:
           SMOKE_OUT: smoke-artifacts/feed-batches
+      - name: Recommendation request scenes and exposure feedback
+        run: node tests/recommendation-feedback.mjs
+        env:
+          SMOKE_OUT: smoke-artifacts/recommendation-feedback
+      - name: Header dynamic detail preview
+        run: node tests/dynamic-hover-preview.mjs
+        env:
+          SMOKE_OUT: smoke-artifacts/dynamic-hover-preview
       - name: Native controls follow the selected accent
         run: node tests/accent-controls.mjs
         env:

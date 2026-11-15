@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## v0.6.63 · 2026-11-15
+
+- Integrate PR #185 with header dynamic details after a half-second hover over a row. Images open their dynamic page, video covers open playback, and details support reading, Escape and retry.
+- Cancel detail requests on close or selection changes and ignore stale responses. Cache up to 20 details for 60 seconds, invalidate them with the list, and preserve article and other content links.
+- Fix #188 by distinguishing initial, scroll and whole-list refresh recommendation requests. Include request counters, rows, columns and device metadata, and serialize requests so each can report the preceding batch.
+- Record viewport exposure and video-link clicks. Filtered, unrendered and prefetched cards stay unexposed. Keep recent request groups and the last 50 clicks in page memory.
+- Add unit coverage for recommendation parameters, cancellation and recovery, plus installed-extension regressions for recommendation feedback and header details on home and playback pages.
+
 ## v0.6.58 · 2026-11-15
 
 - Add a listening shortcut to the video-page header with video/danmaku and cover/lyrics views, using the current player, playback position, volume and speed.
