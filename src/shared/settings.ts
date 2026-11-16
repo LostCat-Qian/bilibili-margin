@@ -73,6 +73,7 @@ export interface Settings {
   replyTree: boolean;
   /** 首页每行几个视频：0 = 按窗口宽度自动，4 / 5 = 固定 */
   cols: 0 | 4 | 5 | 6;
+  homeWidth: 'current' | 'compact' | 'fluid';
   /** 点击「推荐 / 热门 / 关注老片」分类标签刷新列表 */
   tabRefresh: boolean;
   /** 推荐批次导航：每次「换一批」只加载一页，按每批视频数切窗，底部左右箭头翻批 */
@@ -178,6 +179,7 @@ export const DEFAULTS: Settings = {
   speedKeys: true,
   replyTree: true,
   cols: 0,
+  homeWidth: 'current',
   tabRefresh: false,
   batchNav: false,
   batchSize: BATCH_DEFAULT,
@@ -260,6 +262,7 @@ function merge(raw: Partial<Settings> | undefined): Settings {
     headLabels: r.headLabels === true,
     feedLayout: r.feedLayout === 'sidebar' ? 'sidebar' : 'classic',
     zoom: r.zoom === 110 || r.zoom === 120 ? r.zoom : 100,
+    homeWidth: r.homeWidth === 'compact' || r.homeWidth === 'fluid' ? r.homeWidth : 'current',
     tabRefresh: r.tabRefresh === true,
     batchNav: r.batchNav === true,
     batchSize: clampBatchSize(r.batchSize),
@@ -343,6 +346,7 @@ export function sanitizeSettings(raw: unknown): Settings | null {
   if (r.zoom === 100 || r.zoom === 110 || r.zoom === 120) out.zoom = r.zoom;
   if (r.titleFont === 'serif' || r.titleFont === 'sans') out.titleFont = r.titleFont;
   if (r.cols === 0 || r.cols === 4 || r.cols === 5 || r.cols === 6) out.cols = r.cols;
+  if (r.homeWidth === 'current' || r.homeWidth === 'compact' || r.homeWidth === 'fluid') out.homeWidth = r.homeWidth;
   if (typeof r.playerCorners === 'boolean') out.playerCorners = r.playerCorners;
   if (typeof r.feedFollowList === 'boolean') out.feedFollowList = r.feedFollowList;
   if (typeof r.paletteSpeed === 'number') out.paletteSpeed = clampPaletteSpeed(r.paletteSpeed);

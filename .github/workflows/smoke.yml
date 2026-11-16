@@ -84,6 +84,21 @@ jobs:
         run: node tests/dynamic-hover-preview.mjs
         env:
           SMOKE_OUT: smoke-artifacts/dynamic-hover-preview
+      - name: Favorite recovery, deferred folder rendering and App dates
+        run: |
+          SMOKE_OUT=smoke-artifacts/favorites-recovery node tests/favorites-recovery.mjs
+          SMOKE_OUT=smoke-artifacts/favorites-offscreen node tests/favorites-offscreen.mjs
+          SMOKE_OUT=smoke-artifacts/app-feed-time node tests/app-feed-time.mjs
+      - name: Homepage workload, preview cleanup and interface reuse
+        run: |
+          SMOKE_OUT=smoke-artifacts/home-workload node tests/home-workload.mjs
+          SMOKE_OUT=smoke-artifacts/preview-visibility node tests/preview-visibility.mjs
+          SMOKE_OUT=smoke-artifacts/interface-performance node tests/interface-performance.mjs
+      - name: Homepage widths, account motion and native vote themes
+        run: |
+          SMOKE_OUT=smoke-artifacts/home-width node tests/home-width.mjs
+          SMOKE_OUT=smoke-artifacts/account-motion node tests/account-motion.mjs
+          SMOKE_OUT=smoke-artifacts/vote-theme node tests/vote-theme.mjs
       - name: Native controls follow the selected accent
         run: node tests/accent-controls.mjs
         env:

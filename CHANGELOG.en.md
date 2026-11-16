@@ -4,6 +4,47 @@
 
 ## Unreleased
 
+## v0.6.69 · Large-screen layouts and account-card performance
+
+- Add Current, Centered and Fluid homepage width presets, retaining the current layout by default. Presets support automatic columns and manual 4/5/6-column choices; smaller windows retain the existing responsive layout.
+- Change layout attributes without recreating loaded video cards. Width preferences persist, support settings import and synchronize across pages.
+- Size the account-card chain canvas to its actual bounds and expand it as needed during dragging, avoiding a full-screen high-DPI buffer for a small chain.
+- Limit highlight updates to 60 per second while retaining display-rate interpolation for card motion. Add 260 Hz clock coverage and browser regressions for dragging, resizing and shortcut hit areas.
+
+## v0.6.68 · Vote page theme fix
+
+- Fix the native standalone vote page retaining a white outer panel and pale text in dark mode.
+- Synchronize option tracks, percentage fills, headings and descriptions with the selected theme, retaining paid-vote accents, native clicks and vote percentages.
+- Add loaded-extension regressions for both vote hosts, repeated theme changes and late native stylesheets.
+
+## v0.6.67 · Loading and animation performance
+
+- Compute glass height fields and clipping masks using symmetry, and simplify straight-edge distances to reduce main-thread work on first use and resize.
+- Cache the background lens attribute location during initialization to reduce per-frame WebGL queries.
+- Share attack and release coefficients across audio frequency bands in each frame.
+- Add pixel regressions for odd, even and tiny glass textures and fractional radii.
+
+## v0.6.66 · Interface responsiveness
+
+- Reuse recent home feed cards across recommendations, popular and batch navigation, with a 240-card cache limit. Display-option changes invalidate cached cards, and tab changes stop media previews.
+- Batch segmented-control measurements before updating slider styles. Settings tabs update the departing and incoming panels and coalesce indicator measurements into the next frame.
+- Defer settings synchronization while closed and skip redundant writes on reopening. Create the heatmap on demand when enabled.
+
+## v0.6.65 · 2026-11-15
+
+- Wait for the existing 1.5-second retry interval after fully duplicate recommendation batches, reducing request bursts and skeleton rebuilding. Continue filling batches containing new items affected by filters.
+- Pause automatic home loading and batch prefetch while a drawer is open or the document is hidden, and resume as needed on return. Skip repeated list geometry checks while a retry is pending.
+- Pause cover previews and release their media resources when the page hides or leaves. Cancel pending hover work and prevent subsequent media requests after hiding.
+- Add built-extension regressions for request counts, skeleton nodes, resumption and media cleanup. With fixed duplicate fixtures, requests fell from 30 to 6 and skeleton nodes from 60 to 12 over 4.8 seconds. Drawer and simulated-background intervals dispatched zero additional automatic feed requests.
+
+## v0.6.64 · 2026-11-15
+
+- Pause automatic favorites reads after preview or pagination failures and expose a retry action in the footer. Stop dispatching queued work after HTTP 412, API rejection or network errors, and reuse successful cached pages when retrying.
+- Apply a 12-second timeout to favorite-video and subscribed-collection reads so stalled responses release their request slots. Retry loads the selected folder after switching while paused.
+- Generate folder textures and update blurred copies when folders enter the viewport. Load back covers lazily and coalesce offscreen updates until the folder becomes visible.
+- Carry native App recommendation date labels, such as yesterday with a time or a month/day, into the existing publication row. Honor date and duration visibility settings using data already present in recommendation responses.
+- Add regression coverage for failure recovery, timeout, offscreen rendering and App date display. In isolated Chromium with 50 folders lacking covers, initial generated textures decreased from 50 to 9 and pixel allocation fell by about 82%. Reporter-device performance and the cause of the reported HTTP 412 still require reproduction.
+
 ## v0.6.63 · 2026-11-15
 
 - Integrate PR #185 with header dynamic details after a half-second hover over a row. Images open their dynamic page, video covers open playback, and details support reading, Escape and retry.
@@ -11,6 +52,33 @@
 - Fix #188 by distinguishing initial, scroll and whole-list refresh recommendation requests. Include request counters, rows, columns and device metadata, and serialize requests so each can report the preceding batch.
 - Record viewport exposure and video-link clicks. Filtered, unrendered and prefetched cards stay unexposed. Keep recent request groups and the last 50 clicks in page memory.
 - Add unit coverage for recommendation parameters, cancellation and recovery, plus installed-extension regressions for recommendation feedback and header details on home and playback pages.
+
+## v0.6.62 · 2026-11-15
+
+- Integrate the approved bars, radial, grid, line and dots visualizer forms, with grid selected by default.
+- Render the current video's live FFT samples through the shared audio analyser and frame loop, reusing pause, background and reduced-motion handling.
+- Adapt visualizer dimensions and controls to both desktop views, with arrow keys, Home/End and a single keyboard tab stop.
+- Verify all five forms, paused rendering, keyboard selection and original-picture lyric menu layering.
+
+## v0.6.61 · 2026-11-15
+
+- Fix the original-picture lyric player covering lyric options by using a top-layer popover on supported browsers.
+- Keep the menu inside the viewport during resizing and scrolling, dismiss it when clicking the native video, and restore keyboard focus on Escape.
+- Provide an in-flow menu on older browsers and verify original-picture lyrics, menu actions and cleanup on exit.
+
+## v0.6.60 · 2026-11-15
+
+- Integrate the approved desktop listening prototype with larger artwork, side-by-side lyrics and a horizontal glass playback dock. Blend the artwork atmosphere into the shared home background.
+- Group lyric import, caption reading and timing offset controls in an accessible menu with keyboard navigation, Escape focus restoration and outside-click dismissal.
+- Refine active-line hierarchy, light-theme lyric contrast and staggered entrance motion. Improve long-title handling and layouts across six desktop viewport sizes.
+- Fix video metadata overlapping the bottom controls in large windows. Clean up menu and motion state on exit and reuse the existing player, FFT and glass rendering.
+
+## v0.6.59 · 2026-11-15
+
+- Redesign the desktop listening surface with refined cover, track and lyric proportions and a large video view.
+- Bring playback controls into a floating glass dock with a separate refraction layer, soft highlights and consistent IconMCP controls.
+- Add an eased sliding view indicator, gentle playback-button spring feedback and restrained lyric and view transitions.
+- Improve narrow desktop layouts, keyboard focus and reduced-motion support. Cancel interrupted transitions and release glass filters and observers on exit.
 
 ## v0.6.58 · 2026-11-15
 

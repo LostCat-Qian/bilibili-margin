@@ -181,6 +181,14 @@
 @media (max-width: 1099px) { .app.home { --cols: 4; } }
 @media (max-width: 900px) { .app.home { --g: 18px; --cols: 3; } }
 .app.home .grid:not(.fav-grid) { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 28px 16px; }
+@media (min-width: 1280px) {
+  .app.home[data-home-width="compact"] { --g: max(56px, calc((100vw - 1600px) / 2)); }
+  .app.home[data-home-width="compact"][data-cols="auto"] { --cols: 6; }
+  .app.home[data-home-width="fluid"] { --g: clamp(24px, 3.3vw, 88px); }
+}
+@media (min-width: 1700px) {
+  .app.home[data-home-width="compact"] { --g: max(88px, calc((100vw - 1600px) / 2)); }
+}
 
 /* 布局：足迹(1216px，尺寸不变) + 天气同一排；放不下时天气换到下一行（480px 宽，靠左） */
 .dash { display: grid; grid-template-columns: 1216px minmax(0, 1fr); gap: 16px; margin-top: 24px; align-items: stretch; }

@@ -145,6 +145,7 @@ function setSkinMirror(v: string): void { try { if (skinMirror() !== v) localSto
 function skinStyle(kind: SkinKind | 'live-home', theme: string): HTMLStyleElement {
   const de = document.documentElement;
   de.classList.add('margin-skin', `margin-${kind}`);
+  de.classList.toggle('margin-vote', kind === 'page' && /^\/vote\/h5\/(?:index\/?)?$/.test(location.pathname));
   const dk = kind === 'page' ? detailKind() : null;
   if (dk) { de.classList.add('margin-detail'); de.dataset.marginDetail = dk; }
   de.dataset.marginTheme = theme === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
@@ -160,7 +161,7 @@ function skinStyle(kind: SkinKind | 'live-home', theme: string): HTMLStyleElemen
 function unskin(kind: SkinKind | 'live-home'): void {
   const de = document.documentElement;
   document.getElementById('margin-watch-css')?.remove();
-  de.classList.remove('margin-skin', `margin-${kind}`, 'margin-has-bg', 'margin-detail', 'margin-detail-narrow');
+  de.classList.remove('margin-skin', `margin-${kind}`, 'margin-has-bg', 'margin-detail', 'margin-detail-narrow', 'margin-vote');
   delete de.dataset.marginTheme;
   delete de.dataset.marginDetail;
 }

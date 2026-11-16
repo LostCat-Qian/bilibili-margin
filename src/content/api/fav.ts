@@ -55,12 +55,12 @@ const mediaVideo = (m: any, upper = m.upper): Video => ({
 
 /** 原站的订阅合集接口一次返回完整 medias，由收藏抽屉缓存并分批展示。 */
 export async function seasonVideos(id: number): Promise<Video[]> {
-  const data = await getJSON<{ medias: any[] | null; info?: { upper?: any } }>('/x/space/fav/season/list', { season_id: id });
+  const data = await getJSON<{ medias: any[] | null; info?: { upper?: any } }>('/x/space/fav/season/list', { season_id: id }, AbortSignal.timeout(12_000));
   return (data.medias ?? []).filter((m) => m.bvid && (m.attr == null || m.attr === 0)).map((m) => mediaVideo(m, m.upper ?? data.info?.upper));
 }
 
 export async function folderVideos(id: number, page: number): Promise<{ list: Video[]; more: boolean }> {
-  const data = await getJSON<{ medias: any[] | null; has_more: boolean }>('/x/v3/fav/resource/list', { media_id: id, pn: page, ps: 20, platform: 'web' });
+  const data = await getJSON<{ medias: any[] | null; has_more: boolean }>('/x/v3/fav/resource/list', { media_id: id, pn: page, ps: 20, platform: 'web' }, AbortSignal.timeout(12_000));
   const list = (data.medias ?? [])
     .filter((m) => m.type === 2 && m.bvid && m.attr === 0)
     .map((m) => mediaVideo(m));

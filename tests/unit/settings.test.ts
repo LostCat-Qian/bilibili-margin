@@ -19,6 +19,16 @@ const setChromeMock = () => {
 };
 
 describe('settings 迁移（merge / loadSettings）', () => {
+  it('旧设置保留当前内容宽度，三档可保存和导入且非法值回落', async () => {
+    expect((await loadSettings()).homeWidth).toBe('current');
+    for (const homeWidth of ['current', 'compact', 'fluid'] as const) {
+      await saveSettings({ homeWidth });
+      expect((await loadSettings()).homeWidth).toBe(homeWidth);
+      expect(sanitizeSettings({ homeWidth })?.homeWidth).toBe(homeWidth);
+    }
+    expect(sanitizeSettings({ homeWidth: '<style>' })?.homeWidth).toBe('current');
+    expect(sanitizeSettings({ homeWidth: 1600 })?.homeWidth).toBe('current');
+  });
   it('动态左侧关注列表默认显示，开关可保存与导入', async () => {
     expect((await loadSettings()).feedFollowList).toBe(true);
     expect((await saveSettings({ feedFollowList: false })).feedFollowList).toBe(false);
