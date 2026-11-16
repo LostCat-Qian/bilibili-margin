@@ -165,7 +165,7 @@ try {
   await lyricMenu.locator('summary').focus();
   await page.keyboard.press('Enter');
   assert(await lyricMenu.evaluate(el => el.open));
-  assert(await panel.getByLabel('歌词延后秒数').isVisible());
+  await panel.getByLabel('歌词延后秒数').waitFor({ state: 'visible' });
   await page.keyboard.press('Escape');
   assert.equal(await lyricMenu.evaluate(el => el.open), false);
   assert(await panel.isVisible());
