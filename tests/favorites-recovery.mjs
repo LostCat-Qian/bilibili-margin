@@ -13,11 +13,11 @@ const context = await chromium.launchPersistentContext(mkdtempSync(join(tmpdir()
   args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
 });
 const results = [], errors = [], requests = [];
-let mode = '412';
+let mode = '412', releaseList;
 try {
   await installMocks(context, async address => {
     if (address.includes('/fav/folder/created/list')) {
-      if (mode === 'list-slow') await new Promise(resolve => setTimeout(resolve, 700));
+      if (mode === 'list-slow') await new Promise(resolve => { releaseList = resolve; });
       return { code: 0, data: {
       list: Array.from({ length: 50 }, (_, i) => ({ id: 60000 + i, title: `收藏 ${i}`, media_count: 4, attr: 2,
         cover: 'https://i0.hdslb.com/folder.jpg' })),
@@ -140,9 +140,13 @@ try {
   await check('reopening after the folder list completed while closed loads the first page', async () => {
     await page.goto('https://www.bilibili.com/');
     await page.locator('#margin-root .top').waitFor();
+    requests.length = 0;
     await page.evaluate(() => dispatchEvent(new Event('margin:open-fav')));
     await dialog.getByRole('button', { name: '关闭', exact: true }).click();
-    await page.waitForTimeout(900);
+    await dialog.waitFor({ state: 'hidden' });
+    assert.equal(typeof releaseList, 'function', 'folder request must be pending before closing');
+    releaseList();
+    await page.getByRole('dialog', { name: '收藏夹', exact: true, includeHidden: true }).locator('.gf-root').nth(49).waitFor({ state: 'attached' });
     assert.equal(requests.filter(r => r.mode === 'list-slow').length, 0);
     await page.evaluate(() => dispatchEvent(new Event('margin:open-fav')));
     await dialog.locator('.fav-grid .title').first().waitFor({ state: 'attached' });
