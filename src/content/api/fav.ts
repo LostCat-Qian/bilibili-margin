@@ -27,10 +27,10 @@ export async function publicFolder(mid: number, id: number): Promise<Folder> {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export async function folders(refreshLogin = false): Promise<Folder[] | null> {
+export async function folders(refreshLogin = false, page = 1): Promise<Folder[] | null> {
   const n = await nav(refreshLogin);
   if (!n?.isLogin || !n.mid) return null;
-  const data = await getJSON<{ list: any[] | null }>('/x/v3/fav/folder/created/list', { up_mid: n.mid, pn: 1, ps: 50 });
+  const data = await getJSON<{ list: any[] | null }>('/x/v3/fav/folder/created/list', { up_mid: n.mid, pn: page, ps: 50 });
   return (data.list ?? []).map((f) => ({ id: f.id, title: f.title, count: f.media_count, cover: String(f.cover || '').replace(/^http:/, 'https:'), mid: n.mid!, isDefault: (f.attr & 2) === 0, isPrivate: (f.attr & 1) === 1 }));
 }
 

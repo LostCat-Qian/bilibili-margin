@@ -1,4 +1,4 @@
-import { loadSettings, saveSettings, type Settings, type Theme } from '../shared/settings';
+import { loadSettings, saveSettings, REDESIGN_PAGES, REDESIGN_LABELS, type Settings, type Theme } from '../shared/settings';
 import { optionalFetch } from '../shared/privacy';
 
 const $ = <T extends HTMLElement>(s: string) => document.querySelector(s) as T;
@@ -6,6 +6,7 @@ const $ = <T extends HTMLElement>(s: string) => document.querySelector(s) as T;
 function paint(s: Settings): void {
   $('#enabled').setAttribute('aria-checked', String(s.enabled));
   $('#watch').setAttribute('aria-checked', String(s.watch));
+  document.querySelectorAll<HTMLButtonElement>('[data-page]').forEach(b => b.setAttribute('aria-checked', String(!s.pageOff.includes(b.dataset.page as typeof REDESIGN_PAGES[number]))));
   document.querySelectorAll<HTMLButtonElement>('#theme button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === s.theme)));
 }
 
@@ -13,6 +14,21 @@ function paint(s: Settings): void {
   const manifest = chrome.runtime.getManifest();
   $('#ver').textContent = manifest.version_name || manifest.version;
   let s = await loadSettings();
+  for (const page of REDESIGN_PAGES) {
+    const row = document.createElement('div'); row.className = 'row';
+    const label = document.createElement('span'); label.textContent = REDESIGN_LABELS[page];
+    const button = document.createElement('button'); button.className = 'sw'; button.dataset.page = page;
+    button.setAttribute('role', 'switch'); button.setAttribute('aria-label', `${REDESIGN_LABELS[page]}重设计`);
+    button.onclick = async () => {
+      button.disabled = true;
+      try {
+        s = await loadSettings();
+        s = await saveSettings({ pageOff: s.pageOff.includes(page) ? s.pageOff.filter(p => p !== page) : [...s.pageOff, page] });
+        paint(s);
+      } finally { button.disabled = false; }
+    };
+    row.append(label, button); $('#pages').append(row);
+  }
   paint(s);
   $('#enabled').addEventListener('click', async () => { s = await saveSettings({ enabled: !s.enabled }); paint(s); });
   $('#watch').addEventListener('click', async () => { s = await saveSettings({ watch: !s.watch }); paint(s); });

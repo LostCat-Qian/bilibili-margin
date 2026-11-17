@@ -1,6 +1,9 @@
 import { BATCH_DEFAULT, clampBatchSize } from './batch';
 
 export type Theme = 'auto' | 'light' | 'dark';
+export const REDESIGN_PAGES = ['home', 'feed', 'live', 'watch'] as const;
+export type RedesignPage = typeof REDESIGN_PAGES[number];
+export const REDESIGN_LABELS: Record<RedesignPage, string> = { home: '首页', feed: '动态', live: '直播', watch: '播放页' };
 /** 只保留经典配色（雾蓝 / 夜蓝已按用户要求移除） */
 export type Palette = 'classic';
 export type ShaderId = 'aurora' | 'silk' | 'mesh' | 'grain' | 'ice' | 'veil' | 'smoke' | 'neuro' | 'flow' | 'rays' | 'blend' | 'flux' | 'gate';
@@ -49,6 +52,8 @@ export interface Settings {
   hoverPreview: boolean;
   /** 重新设计视频播放页（保留 B 站原生播放器与评论） */
   watch: boolean;
+  /** 单独保留原站外观的页面；空列表保持原有行为。 */
+  pageOff: RedesignPage[];
   /** 首页开场动画（每次打开浏览器后首次进入首页播放一次） */
   intro: boolean;
   /** YouTube 风格首页（可选，默认关）：只借布局结构，配色和主题不变；只影响首页 */
@@ -167,6 +172,7 @@ export const DEFAULTS: Settings = {
   glass: 'soft',
   hoverPreview: true,
   watch: true,
+  pageOff: [],
   intro: true,
   footprint: true,
   weather: true,
@@ -248,6 +254,7 @@ function merge(raw: Partial<Settings> | undefined): Settings {
   return {
     ...DEFAULTS,
     ...r,
+    pageOff: Array.isArray(r.pageOff) ? REDESIGN_PAGES.filter(p => r.pageOff!.includes(p)) : [],
     filters: { ...DEFAULTS.filters, ...(r.filters ?? {}) },
     bg: { ...DEFAULTS.bg, ...(r.bg ?? {}) },
     homeHide: Array.isArray(r.homeHide) ? HOME_BITS.filter((b) => r.homeHide!.includes(b)) : [],
@@ -302,6 +309,10 @@ export async function loadSettings(): Promise<Settings> {
   return merge(r[KEY] as Partial<Settings> | undefined);
 }
 
+export function redesignEnabled(s: Settings, page?: RedesignPage): boolean {
+  return s.enabled && (page === 'home' || s.watch) && (!page || !s.pageOff.includes(page));
+}
+
 export async function saveSettings(patch: Partial<Settings>): Promise<Settings> {
   const next = merge({ ...(await loadSettings()), ...patch });
   await chrome.storage.local.set({ [KEY]: next });
@@ -322,6 +333,8 @@ export function sanitizeSettings(raw: unknown): Settings | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const r = raw as Record<string, unknown>;
   const out: Partial<Settings> = {};
+  const pageOff = r.pageOff;
+  if (Array.isArray(pageOff)) out.pageOff = REDESIGN_PAGES.filter(p => pageOff.includes(p));
   if (typeof r.privacyExternal === 'boolean') out.privacyExternal = r.privacyExternal;
   if (typeof r.searchHistory === 'boolean') out.searchHistory = r.searchHistory;
   if (r.accent === 'classic' || r.accent === 'blue' || r.accent === 'pink') out.accent = r.accent;

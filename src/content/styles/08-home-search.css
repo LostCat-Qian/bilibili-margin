@@ -379,6 +379,11 @@
 .dp-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; color: inherit; transition: background .15s var(--ease-out); }
 .dp-row:hover { background: var(--chip); }
 .dp-entry { position: relative; }
+.dp-entry:has(> .dp-remove) .dp-row { padding-right: 42px; }
+.dp-remove { position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface); color: var(--muted); opacity: 0; transition: opacity .15s var(--ease-out), background .15s var(--ease-out); }
+.dp-remove svg { width: 14px; height: 14px; }
+.dp-entry:hover .dp-remove, .dp-remove:focus-visible, .dp-remove:disabled { opacity: 1; }
+.dp-remove:hover { background: var(--chip); color: var(--ink); }
 .dp-entry:not(:has(.dp-cover)) .dp-row { padding-right: 48px; }
 .dp-entry > button.card-later { top: 50%; right: 20px; opacity: 1; transform: translateY(-50%); }
 .dp-video-filter { padding: 4px 8px; border-radius: 99px; color: var(--muted); background: var(--chip); font: inherit; }

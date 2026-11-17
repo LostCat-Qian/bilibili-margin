@@ -3,7 +3,7 @@
  * 先藏原版 / 拦原版脚本。各页面的界面代码按路由从 dist/pages/*.js 动态 import（和 flux.js 同一套做法），
  * 不再把整站代码塞进一个 447KB 的 content.js。
  */
-import { loadSettings, onSettingsChange, type Settings } from '../shared/settings';
+import { loadSettings, onSettingsChange, redesignEnabled, type RedesignPage, type Settings } from '../shared/settings';
 import { startTracking } from './footprint/beat';
 import { injectFonts } from './fonts';
 import { muteNative, setGuard, guardEnabled } from './native-guard';
@@ -70,7 +70,7 @@ let airborneGeneration = 0;
 /** 设置开关映射到文档级 class；HTML 只负责命中 CSS，具体逻辑在各自组件里 */
 function applyGlobalUi(s: Settings): void {
   const active = s.enabled && !sessionStorage.getItem('margin:off') && !offByUrl();
-  applyAppearance(s,active);
+  applyAppearance(s,active && redesignOn(s));
   installAppNavigation(active);
   setSponsorSkip(active && s.sponsorSkip);
   const jumpEnabled = active && s.danmakuJump;
@@ -135,11 +135,19 @@ function detailKind(): DetailKind | null {
 }
 const offByUrl = () => new URLSearchParams(location.search).get('margin') === 'off';
 
+function redesignPage(): RedesignPage | undefined {
+  if (isHome()) return 'home';
+  if (isWatch() || detailKind() === 'bangumi') return 'watch';
+  if (isLive() || isLiveHome()) return 'live';
+  if (isFeed() || detailKind() === 'dyn' || detailKind() === 'opus') return 'feed';
+}
+const redesignOn = (s: Settings) => redesignEnabled(s, redesignPage());
+
 /**
  * 播放页 / 搜索页等换皮页面的全局样式。入口脚本里同步挂上（用 localStorage 里上次设置的镜像判断开没开），
  * 不等页面模块加载，避免先闪一下原版。
  */
-const SKIN_KEY = 'margin:skin';
+const SKIN_KEY = `margin:skin:${redesignPage() ?? 'other'}`;
 function skinMirror(): string | null { try { return localStorage.getItem(SKIN_KEY); } catch { return null; } }
 function setSkinMirror(v: string): void { try { if (skinMirror() !== v) localStorage.setItem(SKIN_KEY, v); } catch { /* 隐私模式 */ } }
 function skinStyle(kind: SkinKind | 'live-home', theme: string): HTMLStyleElement {
@@ -174,7 +182,7 @@ async function startLiveHome(): Promise<void> {
   let settings = await startupSettings().catch(error => { unskin('live-home'); throw error; });
   const apply = (next: Settings) => {
     settings = next;
-    const on = settings.enabled && settings.watch;
+    const on = redesignOn(settings);
     setSkinMirror(on ? settings.theme : '0');
     if (on) skinStyle('live-home', settings.theme);
     else unskin('live-home');
@@ -197,7 +205,7 @@ async function startWatch(kind: SkinKind = 'watch'): Promise<void> {
   if (settings.enabled && kind === 'search') {
     load('search-exact').then(m => m.mountSearchExact()).catch(e => console.error('[MARGIN] 搜索试用加载失败', e));
   }
-  const on = settings.enabled && settings.watch;
+  const on = redesignOn(settings);
   setSkinMirror(on ? settings.theme : '0');
   if (!on) { unskin(kind); return; }
   skinStyle(kind, settings.theme);
@@ -217,8 +225,7 @@ async function startWatch(kind: SkinKind = 'watch'): Promise<void> {
     load('channel-carousel').then(m => m.mountChannelCarousel()).catch(e => console.error('[MARGIN] 分区轮播加载失败', e));
   }
   onSettingsChange((next, prev) => {
-    if (next.enabled !== prev.enabled || next.watch !== prev.watch) location.reload();
-    else skin.update(next);
+    if (redesignOn(next) === redesignOn(prev)) skin.update(next);
   });
 }
 
@@ -309,7 +316,8 @@ async function start(): Promise<void> {
   mod.catch(() => {});
 
   const settings = await startupSettings();
-  if (!settings.enabled) { hide.remove(); unmute(); return disabledAfterMute(); }
+  setSkinMirror(redesignOn(settings) ? settings.theme : '0');
+  if (!redesignOn(settings)) { hide.remove(); unmute(); return disabledAfterMute(); }
   setGuard(true);
 
   const app = await guarded('home', () => mod.then((m) => {
@@ -320,8 +328,7 @@ async function start(): Promise<void> {
   if (!app) return;
 
   onSettingsChange((next, prev) => {
-    if (next.enabled !== prev.enabled) location.reload();
-    else app.update(next);
+    if (redesignOn(next) === redesignOn(prev)) app.update(next);
   });
 }
 
@@ -332,7 +339,8 @@ async function takeover<M>(mod: Promise<M>, make: (m: M, s: Settings) => { shell
   const hide = hideOriginal();
   const unmute = mute ? muteNative() : () => {};
   const settings = await startupSettings();
-  if (!settings.enabled || !settings.watch) { hide.remove(); unmute(); return mute ? disabledAfterMute() : undefined; }
+  setSkinMirror(redesignOn(settings) ? settings.theme : '0');
+  if (!redesignOn(settings)) { hide.remove(); unmute(); return mute ? disabledAfterMute() : undefined; }
   if (mute) setGuard(true);
   const name = location.hostname.split('.')[0] + location.pathname;
   const page = await guarded(name, () => mod.then((m) => {
@@ -342,8 +350,7 @@ async function takeover<M>(mod: Promise<M>, make: (m: M, s: Settings) => { shell
   }), () => restoreNative(hide, mute && guardEnabled()));
   if (!page) return;
   onSettingsChange((next, prev) => {
-    if (next.enabled !== prev.enabled || next.watch !== prev.watch) location.reload();
-    else page.update(next);
+    if (redesignOn(next) === redesignOn(prev)) page.update(next);
   });
 }
 
@@ -391,7 +398,7 @@ function disabledAfterMute(): void {
 const SANS = '"Geist", "Margin Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
 function applyFont(s: Settings): void {
   const de = document.documentElement;
-  const on = s.enabled;
+  const on = redesignOn(s);
   const custom = on && s.bodyFont ? `"${s.bodyFont}", ` : '';
   const sans = custom + SANS;
   const set = (k: string, v: string | null) => { if (v) de.style.setProperty(k, v); else de.style.removeProperty(k); };
@@ -399,7 +406,7 @@ function applyFont(s: Settings): void {
   set('--margin-title', on && s.titleFont === 'sans' ? sans : null);
   set('--margin-mono', on && !s.monoNum ? sans : null);
   // 视频 CDN 节点：页面主环境的 cdn.js 同步读 localStorage（v0.47.2）
-  try { if (on && s.cdn) localStorage.setItem('margin:cdn', s.cdn); else localStorage.removeItem('margin:cdn'); } catch { /* 隐私模式 */ }
+  try { if (s.enabled && s.cdn) localStorage.setItem('margin:cdn', s.cdn); else localStorage.removeItem('margin:cdn'); } catch { /* 隐私模式 */ }
   set('--margin-zoom', on && s.zoom !== 100 ? String(s.zoom / 100) : null);
   set('--margin-rk', on && s.radius !== 100 ? String(s.radius / 100) : null);
   set('--margin-player-rk', on && !s.playerCorners ? '0' : null);
@@ -407,7 +414,10 @@ function applyFont(s: Settings): void {
 }
 if (!offByUrl() && !sessionStorage.getItem('margin:off')) {
   startupSettings().then((s) => { applyFont(s); applyGlobalUi(s); }).catch(() => {});
-  onSettingsChange((n) => { applyFont(n); applyGlobalUi(n); });
+  onSettingsChange((n, p) => {
+    if (redesignOn(n) !== redesignOn(p)) { setSkinMirror(redesignOn(n) ? n.theme : '0'); setGuard(redesignOn(n)); location.reload(); return; }
+    applyFont(n); applyGlobalUi(n);
+  });
 }
 
 /**

@@ -4,6 +4,31 @@
 
 ## Unreleased
 
+## [v0.6.73](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.73) · Space favorites and collection order
+
+- Add remove, move and copy actions to owned favorites on profile pages, in both grid and list layouts, retaining Bilibili permissions.
+- Share the drawer's action component. Fetch destination folders only when needed, including later pages and owned private folders. Keep videos and the selected destination on failure and block duplicate submissions.
+- Add native default/reverse ordering to collections and series. Series default to newest first; collections keep the creator's native arrangement. Reset pagination on changes and ignore stale responses.
+- Reuse existing controls without new dependencies, permissions or global settings. Include search-return, hover-list, per-page preference and follow-avatar fixes from 0.6.70–0.6.72.
+
+## v0.6.72 · Dynamic follow-list avatars
+
+- Restore horizontal avatar/name rows in the left follow list instead of inheriting the top avatar strip's column layout.
+- Fit each avatar to its 26px circular frame, preventing a 44px image from being clipped. Retain the existing top-strip and sidebar sizes.
+- Add loaded-extension coverage for both themes, 1440/2560px windows and layout switching.
+
+## v0.6.71 · Per-page redesign controls (local trial)
+
+- Add independent Home, Dynamic, Live and Watch redesign choices in settings and the extension popup, preserving current behavior by default. Dynamic details follow Dynamic; bangumi follows Watch.
+- Restore native appearance when a page is disabled and allow recovery through the extension popup. Reload only affected pages; scope early-theme mirrors and native-script guards to prevent cross-page interference.
+- Retain 0.6.70 search-return, header pagination and Watch Later removal fixes. Autoplay extensions and emoji/mention controls remain isolated previews outside the installed page code.
+
+## v0.6.70 · Search return and header lists
+
+- Close search panels before navigation and release input focus. Clear stale panels, morph origins and particle animations when leaving, backgrounding or restoring a cached page, retaining unsubmitted drafts.
+- Append header favorites, history and Watch Later previews in groups of eight. Reuse buffered results and request the next server page only when needed; allow explicit retry after loading errors.
+- Add hover/focus Watch Later removal. Update the list only after server confirmation, prevent duplicate submissions and retain entries on failure.
+
 ## v0.6.69 · Large-screen layouts and account-card performance
 
 - Add Current, Centered and Fluid homepage width presets, retaining the current layout by default. Presets support automatic columns and manual 4/5/6-column choices; smaller windows retain the existing responsive layout.

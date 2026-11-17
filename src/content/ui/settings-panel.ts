@@ -1,5 +1,5 @@
 import type { BgMode, HomeBit, HomeSection, Settings, ShaderId, Theme } from '../../shared/settings';
-import { BG_IMAGE_KEY, clampPaletteSpeed, cleanFont, DEFAULTS, HOME_BITS, HOME_SECTION_NAMES, normalizeHomeOrder, replaceSettings, sanitizeSettings, saveSettings } from '../../shared/settings';
+import { BG_IMAGE_KEY, clampPaletteSpeed, cleanFont, DEFAULTS, HOME_BITS, HOME_SECTION_NAMES, REDESIGN_PAGES, REDESIGN_LABELS, normalizeHomeOrder, replaceSettings, sanitizeSettings, saveSettings } from '../../shared/settings';
 import { ACTIVITY_KEY, sanitizeActivity } from '../../shared/activity';
 import { importActivity } from '../footprint/store';
 import { compressImage } from '../bg/background';
@@ -42,6 +42,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   const s0 = get();
   const version = chrome.runtime.getManifest().version_name || chrome.runtime.getManifest().version;
   const enabledT = toggle(s0.enabled, '启用 MARGIN', (value) => save({ enabled: value }));
+  const pages = pillToggles(REDESIGN_PAGES.map(p => [p, REDESIGN_LABELS[p]]), REDESIGN_PAGES.filter(p => !s0.pageOff.includes(p)), on => save({ pageOff: REDESIGN_PAGES.filter(p => !on.includes(p)) }));
   const externalT = toggle(s0.privacyExternal, '允许外部辅助服务', (value) => save({ privacyExternal: value }));
   const historyT = toggle(s0.searchHistory, '保存最近搜索', (value) => save({ searchHistory: value }));
   const clearHistory = h('button', { type: 'button', class: 'ghost small', onclick: async () => {
@@ -595,6 +596,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   sheet.section('overview', '总览', '常用的开关都在这里；左侧可以按类别找到全部设置。',
     row('启用 MARGIN', '关闭后本页立即恢复 B 站原版；也可以在扩展弹窗里重新打开', enabledT),
     row('其他页面重设计', '播放页、搜索页、空间、动态等，只换外观不改功能', watch),
+    block('按页面重设计', '选中使用映间外观，取消后恢复原站。除首页外还需开启上方总开关；也可在浏览器扩展弹窗重新开启', pages),
     block('明暗', '跟随系统时随浏览器的深浅色自动切换', theme),
     row('消息提醒', '关闭后顶栏不再显示消息未读数，动态角标不受影响', msgT),
     h('div', { class: 'row' },
@@ -733,6 +735,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       jumpT.setAttribute('aria-checked', String(s.danmakuJump));
       airT.setAttribute('aria-checked', String(s.danmakuAirborne));
       watch.setAttribute('aria-checked', String(s.watch));
+      pages.set(REDESIGN_PAGES.filter(p => !s.pageOff.includes(p)));
       foot.setAttribute('aria-checked', String(s.footprint));
       wxT.setAttribute('aria-checked', String(s.weather));
       searchT.setAttribute('aria-checked', String(!s.homeHide.includes('search')));
