@@ -136,6 +136,7 @@ for (const app of [true, false]) {
       const saved = await worker.evaluate(async () => (await chrome.storage.local.get('margin:update-check'))['margin:update-check']);
       releaseFailure = true; await check.click();
       await settings.getByText('检查失败，请稍后重试或查看更新日志。', { exact: true }).waitFor();
+      assert(await settings.getByText('检查失败，请稍后重试或查看更新日志。', { exact: true }).evaluate(el => el.getBoundingClientRect().bottom <= el.closest('.stg-body').getBoundingClientRect().bottom + 1), 'update feedback must be visible inside the settings scroll area');
       assert.equal(releaseReads, 2);
       assert.deepEqual(await worker.evaluate(async () => (await chrome.storage.local.get('margin:update-check'))['margin:update-check']), saved);
       await settings.screenshot({ path: join(out, 'update-check.png') });

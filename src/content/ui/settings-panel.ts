@@ -607,7 +607,13 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       updateStatus.textContent = (error as Error).name === 'PrivacyBlocked'
         ? '外部服务已关闭，可在隐私分类开启，或通过更新日志查看。'
         : '检查失败，请稍后重试或查看更新日志。';
-    } finally { checkUpdate.disabled = false; }
+    } finally {
+      checkUpdate.disabled = false;
+      if (sheet.isOpen()) {
+        const bottom = updateStatus.getBoundingClientRect().bottom, edge = sheet.body.getBoundingClientRect().bottom;
+        if (bottom > edge) sheet.body.scrollTop += bottom - edge + 8;
+      }
+    }
   } }, '检查更新') as HTMLButtonElement;
   sheet.section('overview', '总览', '常用的开关都在这里；左侧可以按类别找到全部设置。',
     row('启用 MARGIN', '关闭后本页立即恢复 B 站原版；也可以在扩展弹窗里重新打开', enabledT),
