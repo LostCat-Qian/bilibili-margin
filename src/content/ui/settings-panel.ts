@@ -14,6 +14,7 @@ import { appPoll, appQr, appRemember, appRevoke, appState } from '../api/appfeed
 import { clearLoc, loadLoc, savedLoc, setLoc as setLocWithName } from '../api/weather';
 import { createCityPicker } from './city-picker';
 import { forgetSearch } from '../api/search-history';
+import { checkRelease, newerRelease } from '../../shared/releases';
 
 export interface SettingsPanel { sheet: SettingsPage; sync(s: Settings): void }
 
@@ -593,6 +594,21 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
     replaceSettings(next).then(() => say('已恢复默认设置')).catch(() => say('恢复失败，请重试'));
   };
 
+  const updateStatus = h('small', { role: 'status', 'aria-live': 'polite', style: 'display:block;max-width:240px;margin-top:6px;white-space:normal;overflow-wrap:anywhere;line-height:1.5' });
+  const checkUpdate = h('button', { type: 'button', class: 'ghost small', onclick: async () => {
+    if (checkUpdate.disabled) return;
+    checkUpdate.disabled = true; updateStatus.textContent = '正在检查更新…';
+    try {
+      const release = await checkRelease(true);
+      if (newerRelease(release.tag, chrome.runtime.getManifest().version)) {
+        updateStatus.replaceChildren(h('a', { href: release.url, target: '_blank', rel: 'noopener noreferrer' }, `${release.name || `v${release.tag}`} · 查看新版`));
+      } else updateStatus.textContent = newerRelease(chrome.runtime.getManifest().version, release.tag) ? '当前版本高于最新正式版' : '当前已是最新正式版';
+    } catch (error) {
+      updateStatus.textContent = (error as Error).name === 'PrivacyBlocked'
+        ? '外部服务已关闭，可在隐私分类开启，或通过更新日志查看。'
+        : '检查失败，请稍后重试或查看更新日志。';
+    } finally { checkUpdate.disabled = false; }
+  } }, '检查更新') as HTMLButtonElement;
   sheet.section('overview', '总览', '常用的开关都在这里；左侧可以按类别找到全部设置。',
     row('启用 MARGIN', '关闭后本页立即恢复 B 站原版；也可以在扩展弹窗里重新打开', enabledT),
     row('其他页面重设计', '播放页、搜索页、空间、动态等，只换外观不改功能', watch),
@@ -606,6 +622,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       h('div', { class: 'stg-links' },
         h('a', { href: 'https://github.com/jiuyang5354/bilibili-margin', target: '_blank', rel: 'noopener noreferrer' }, 'GitHub'),
         h('a', { href: 'https://github.com/jiuyang5354/bilibili-margin/releases', target: '_blank', rel: 'noopener noreferrer' }, '更新日志'))),
+    row('版本更新', '商店版由浏览器自动更新；解压安装版下载后覆盖原文件夹并重新加载。', h('div', { style: 'max-width:240px;min-width:0;text-align:right' }, checkUpdate, updateStatus)),
     h('div', { class: 'row' },
       h('div', { class: 'row-label' },
         h('span', {}, '恢复默认设置'),

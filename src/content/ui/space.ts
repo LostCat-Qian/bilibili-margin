@@ -52,6 +52,7 @@ export class SpaceApp {
   private offset = '';
   private done = false;
   private loading = false;
+  private pageFailed = false;
   private gen = 0;
   private list!: HTMLElement;
   private status!: HTMLElement;
@@ -144,6 +145,15 @@ export class SpaceApp {
     })
       .catch((e) => hero.replaceWith(h('section', { class: 'sp-hero' }, h('div', { class: 'sp-banner' }), h('div', { class: 'sp-id' }, h('div', { class: 'sp-who' }, h('h1', {}, `UID ${this.mid}`), h('p', { class: 'sp-sign' }, `资料加载失败：${(e as Error).message}`))))));
     new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) this.load(); }, { root: s.app, rootMargin: '900px 0px' }).observe(this.sentinel);
+    // 初次布局时哨兵可能已进入预加载范围，滚到末尾不一定再跨越 IO 阈值。
+    let scrollFrame = 0;
+    s.app.addEventListener('scroll', () => {
+      if (scrollFrame || this.loading || this.done || this.pageFailed) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        if (this.sentinel.getBoundingClientRect().top < innerHeight + 900) this.load();
+      });
+    }, { passive: true });
     this.shell.filter.onChange(() => this.applyFilters());
     this.applyTabUi();
     this.load();
@@ -329,8 +339,8 @@ export class SpaceApp {
       return href ? h('a', { class: 'sp-stat', href, target: '_blank', rel: 'noopener' }, ...inner) : h('div', { class: 'sp-stat' }, ...inner);
     };
     return h('div', { class: 'sp-stats' },
-      stat(i?.follower, '粉丝', `https://space.bilibili.com/${this.mid}/fans/fans`),
-      stat(i?.following, '关注', `https://space.bilibili.com/${this.mid}/fans/follow`),
+      stat(i?.follower, '粉丝', `https://space.bilibili.com/${this.mid}/relation/fans?margin=off`),
+      stat(i?.following, '关注', `https://space.bilibili.com/${this.mid}/relation/follow?margin=off`),
       i?.likes ? stat(i.likes, '获赞') : null,
       i?.views ? stat(i.views, '播放') : null);
   }
@@ -484,7 +494,7 @@ export class SpaceApp {
     this.searchCards.clear();
     this.contentSeen.clear();
     this.gen++;
-    this.page = 1; this.offset = ''; this.done = false; this.loading = false;
+    this.page = 1; this.offset = ''; this.done = false; this.loading = false; this.pageFailed = false;
     this.list.replaceChildren();
     this.status.replaceChildren();
     if (this.hitBox) { this.hitBox.hidden = true; this.hitBox.replaceChildren(); }
@@ -494,7 +504,9 @@ export class SpaceApp {
 
   private async load(manual = false): Promise<void> {
     if (this.loading || this.done) return;
+    if (this.pageFailed && !manual) return;
     if (this.q && this.search && !manual) return;
+    this.pageFailed = false;
     this.loading = true;
     this.status.replaceChildren();
     const gen = this.gen;
@@ -630,6 +642,7 @@ export class SpaceApp {
       if (this.done && this.list.children.length) this.status.replaceChildren(h('span', {}, '没有更多了'));
     } catch (err) {
       if (gen !== this.gen) return;
+      this.pageFailed = true;
       skNodes.forEach((n) => (n as Element).remove());
       this.status.replaceChildren(h('span', {}, `加载失败：${(err as Error).message}`), h('button', { class: 'ghost small', type: 'button', onclick: () => this.load(true) }, '重试'));
       return;

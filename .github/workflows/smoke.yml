@@ -40,6 +40,10 @@ jobs:
           node tests/dynamic-inline-comments.mjs
           node tests/dynamic-inline-reply.mjs
           node tests/dynamic-composer-extension.mjs
+      - name: Card actions, enable switch, private space and update controls
+        run: node tests/reported-20261118.mjs
+        env:
+          SMOKE_OUT: smoke-artifacts/reported-20261118
       - name: Native Lit publish button and motion
         run: node tests/button-motion.mjs
       - name: Favorite actions, message recall and viewport edges

@@ -4,6 +4,15 @@
 
 ## Unreleased
 
+## v0.6.74 · Card actions and page stability
+
+- Keep block, dislike and Watch Later buttons from navigating their enclosing video link in app windows, preserving ordinary link and middle-click behavior.
+- Guard popup enable switches against duplicate saves, read current settings before changes, coalesce reloads and stop stale page mounts.
+- Fall back to the complete favorites API only for the authenticated owner's hidden space list, with pagination and private folders retained. Never apply this fallback to another user's space.
+- Resume space pagination when scrolling past a missed observer threshold. Pause after failed loads until an explicit retry. Use native relationship-page links for following and followers.
+- Add Check for updates to settings, sharing the existing release query and cache. Explicit checks refresh cached data, retain failures for retry and respect optional-service preferences.
+- Autoplay and emoji/mention previews remain pending approval. The reported comment auto-scroll is still awaiting a reproducible live-page case.
+
 ## [v0.6.73](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.73) · Space favorites and collection order
 
 - Add remove, move and copy actions to owned favorites on profile pages, in both grid and list layouts, retaining Bilibili permissions.

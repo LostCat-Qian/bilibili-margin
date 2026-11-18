@@ -48,6 +48,7 @@ type Pages = {
 /** 按需加载页面模块；content script 不能是 ES module，但可以动态 import 扩展里的 ES 模块 */
 const load = <K extends keyof Pages>(name: K): Promise<Pages[K]> => import(/* @vite-ignore */ chrome.runtime.getURL(`pages/${name}.js`));
 let bootSettings: Promise<Settings> | null = null;
+let settingsReload = false;
 const startupSettings = (): Promise<Settings> => bootSettings ??= loadSettings();
 
 const HIDE_CSS = 'html{background:#111!important;overflow:hidden!important}body{display:none!important}@media (prefers-color-scheme: light){html{background:#f5f4f1!important}}';
@@ -200,6 +201,7 @@ async function startWatch(kind: SkinKind = 'watch'): Promise<void> {
   // 首次访问还没有镜像，先按默认主题挂上圆角；读到关闭设置后立即撤回。
   if (mirror !== '0') skinStyle(kind, mirror || 'auto');
   const settings = await startupSettings().catch(error => { unskin(kind); throw error; });
+  if (settingsReload) return;
   // 屏蔽词在原生页面独立生效；即使关闭了「其他页面重设计」，只开过滤也能用
   if (settings.enabled && kind !== 'live') startNativeFilter(kind, settings);
   if (settings.enabled && kind === 'search') {
@@ -209,7 +211,7 @@ async function startWatch(kind: SkinKind = 'watch'): Promise<void> {
   setSkinMirror(on ? settings.theme : '0');
   if (!on) { unskin(kind); return; }
   skinStyle(kind, settings.theme);
-  const skin = await guarded('watch', () => load('watch').then((m) => new m.WatchSkin(settings, kind)), () => unskin(kind));
+  const skin = await guarded('watch', () => load('watch').then((m) => settingsReload ? null : new m.WatchSkin(settings, kind)), () => unskin(kind));
   if (!skin) return;
   // 详情页：右侧作者栏 / 目录 / 操作区按需加载；出错只影响侧栏，换皮照常
   const dk = kind === 'page' ? detailKind() : null;
@@ -316,11 +318,13 @@ async function start(): Promise<void> {
   mod.catch(() => {});
 
   const settings = await startupSettings();
+  if (settingsReload) return;
   setSkinMirror(redesignOn(settings) ? settings.theme : '0');
   if (!redesignOn(settings)) { hide.remove(); unmute(); return disabledAfterMute(); }
   setGuard(true);
 
   const app = await guarded('home', () => mod.then((m) => {
+    if (settingsReload) return null;
     const a = new m.MarginApp(settings);
     document.documentElement.append(a.host);
     return a;
@@ -339,11 +343,13 @@ async function takeover<M>(mod: Promise<M>, make: (m: M, s: Settings) => { shell
   const hide = hideOriginal();
   const unmute = mute ? muteNative() : () => {};
   const settings = await startupSettings();
+  if (settingsReload) return;
   setSkinMirror(redesignOn(settings) ? settings.theme : '0');
   if (!redesignOn(settings)) { hide.remove(); unmute(); return mute ? disabledAfterMute() : undefined; }
   if (mute) setGuard(true);
   const name = location.hostname.split('.')[0] + location.pathname;
   const page = await guarded(name, () => mod.then((m) => {
+    if (settingsReload) return null;
     const p = make(m, settings);
     document.documentElement.append(p.shell.host);
     return p;
@@ -415,7 +421,12 @@ function applyFont(s: Settings): void {
 if (!offByUrl() && !sessionStorage.getItem('margin:off')) {
   startupSettings().then((s) => { applyFont(s); applyGlobalUi(s); }).catch(() => {});
   onSettingsChange((n, p) => {
-    if (redesignOn(n) !== redesignOn(p)) { setSkinMirror(redesignOn(n) ? n.theme : '0'); setGuard(redesignOn(n)); location.reload(); return; }
+    bootSettings = Promise.resolve(n);
+    if (redesignOn(n) !== redesignOn(p)) {
+      setSkinMirror(redesignOn(n) ? n.theme : '0'); setGuard(redesignOn(n));
+      if (!settingsReload) { settingsReload = true; location.reload(); }
+      return;
+    }
     applyFont(n); applyGlobalUi(n);
   });
 }
