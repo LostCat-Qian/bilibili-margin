@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## [v0.6.75](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.75) · Search corners and page stability
+
+- Align the top-right corner of the expanded homepage search panel with its Search button for more even spacing around the corner.
+- Include the 0.6.74 stability fixes for card actions opening videos in app windows and repeated reloads after rapid extension toggle clicks.
+- Improve favorites loading and pagination for your own profile, and correct the native following and followers links. Check for a new release under Settings → Overview → Version updates.
+
 ## v0.6.74 · Card actions and page stability
 
 - Keep block, dislike and Watch Later buttons from navigating their enclosing video link in app windows, preserving ordinary link and middle-click behavior.
