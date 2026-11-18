@@ -9,7 +9,7 @@ import type { FpMessage } from '../shared/activity';
 import { getSponsorSegments } from './sponsor';
 import { handleFootprint } from './footprint';
 import type { SponsorMessage } from '../shared/sponsor';
-import { handleHistory, protectAuthStorage, trustedSender } from './privacy';
+import { clearSearchHistory, handleHistory, protectAuthStorage, trustedSender } from './privacy';
 import { SEARCH_HISTORY_KEY, type HistoryMessage } from '../shared/privacy';
 import { recordVersionInstall } from './updates';
 import { handleWeatherLocation } from './weather-location';
@@ -20,9 +20,12 @@ const serial = <T>(fn: () => Promise<T>): Promise<T> => { const p = queue.then(f
 const authReady = protectAuthStorage();
 void authReady.catch(() => {});
 chrome.storage.onChanged.addListener((changes, area) => {
-  const next = changes['margin:settings']?.newValue as { searchHistory?: boolean } | undefined;
-  if (area === 'local' && changes['margin:settings'] && next?.searchHistory !== true) {
-    void serial(() => chrome.storage.local.remove(SEARCH_HISTORY_KEY));
+  const change = changes['margin:settings'];
+  if (area !== 'local' || !change) return;
+  const previous = change.oldValue as { searchHistory?: boolean } | undefined;
+  const next = change.newValue as { searchHistory?: boolean } | undefined;
+  if (next?.searchHistory !== true) {
+    void serial(() => previous?.searchHistory === true ? clearSearchHistory() : chrome.storage.local.remove(SEARCH_HISTORY_KEY)).catch(() => {});
   }
 });
 
