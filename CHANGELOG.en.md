@@ -4,6 +4,11 @@
 
 ## Unreleased
 
+## [v0.6.78](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.78) · Account card drag and motion settings
+
+- Apply changes to dragging, UI effects, and reduced-motion preferences while the account card is open. Dragging resumes as soon as the settings allow it.
+- Clarify how reduced motion affects weather animation and account card dragging.
+
 ## [v0.6.77](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.77) · Search input and video tabs
 
 - Keep spaces and letters in the focused watch-page search field from triggering the player. Preserve the search panel's keyboard controls and restore normal player shortcuts when it closes.

@@ -1,6 +1,8 @@
 export const UPDATE_PENDING = 'margin:update-pending';
 export const UPDATE_SEEN = 'margin:update-seen';
 export const UPDATE_NOTES = [
+  "展开的账号工牌实时响应拖拽和动效设置，恢复动效后可直接拖动。",
+  "在设置中说明减少动画对天气和账号工牌的影响。",
   "修复播放页搜索时空格和字母误触播放器快捷键。",
   "首页视频卡片右键选择新标签页打开时留在当前页；开启保存最近搜索后可继承仍存在的旧版记录。",
   "对齐首页搜索面板展开时的右上角和搜索按钮，让转角留白更均匀。",
