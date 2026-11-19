@@ -15,7 +15,8 @@ import { LANYARD_STEP_MS, LanyardClock, lanyardCardBounds, lanyardEase, type Lan
 
 const NUM_POINTS = 13;
 const REST_LENGTH = 70;
-const CARD_SCALE = 1.1;
+const CARD_WIDTH = 260;
+const CARD_HEIGHT = 506;
 const SEGMENT_LENGTH = REST_LENGTH / (NUM_POINTS - 1);
 const GRAVITY = 0.55;
 const FRICTION = 0.97;
@@ -224,7 +225,7 @@ function mountCard(a: Account, wrap: HTMLElement, trigger: HTMLElement, face: (p
     // 珠链从头像底部垂下，穿进工牌顶上的孔；卡片太靠右会出视口，就让链子静止时往左斜一点
     anchor.x = r.left + r.width / 2;
     anchor.y = r.bottom - 3;
-    restX = Math.min(anchor.x, innerWidth - (236 * CARD_SCALE) / 2 - 20);
+    restX = Math.min(anchor.x, innerWidth - CARD_WIDTH / 2 - 20);
     const dx = restX - anchor.x;
     restLen = Math.max(REST_LENGTH, Math.hypot(dx, REST_LENGTH * 0.65));
     const dy = Math.sqrt(Math.max(1, restLen ** 2 - dx * dx));
@@ -326,17 +327,17 @@ function mountCard(a: Account, wrap: HTMLElement, trigger: HTMLElement, face: (p
   };
   const HOLE_Y = 20.5; // 孔中心离卡片顶部的距离（未缩放）
   // 卡片几何缓存：以前每帧先写 left/top 再读 offsetLeft/offsetWidth，强制同步重排，Firefox 上尤其卡（用户反馈）
-  let cardW = 236, cardH = 460, cardX = 0, cardY = 0;
+  let cardW = CARD_WIDTH, cardH = CARD_HEIGHT, cardX = 0, cardY = 0;
   let lastCardTransform = '', lastFlipperTransform = '';
-  const measure = () => { cardW = card.offsetWidth || 236; cardH = card.offsetHeight || 460; };
+  const measure = () => { cardW = card.offsetWidth || CARD_WIDTH; cardH = card.offsetHeight || CARD_HEIGHT; };
   const positionCard = () => {
     const last = rendered[rendered.length - 1], prev = rendered[rendered.length - 2];
     // 减去静止时绳子的斜角，卡片静止时保持竖直，甩动时照常转
     const angle = Math.atan2(last.y - prev.y, last.x - prev.x) - Math.PI / 2 - restAngle;
     cardX = last.x - cardW / 2; cardY = last.y - HOLE_Y;
-    const transform = `translate3d(${cardX.toFixed(2)}px,${cardY.toFixed(2)}px,0) rotate(${angle.toFixed(4)}rad) scale(${CARD_SCALE})`;
+    const transform = `translate3d(${cardX.toFixed(2)}px,${cardY.toFixed(2)}px,0) rotate(${angle.toFixed(4)}rad)`;
     if (transform !== lastCardTransform) { card.style.transform = transform; lastCardTransform = transform; }
-    cardBounds = lanyardCardBounds(last.x, last.y, cardW, cardH, angle, CARD_SCALE, HOLE_Y);
+    cardBounds = lanyardCardBounds(last.x, last.y, cardW, cardH, angle, 1, HOLE_Y);
   };
   let hovering = false, overControl = false, lastMx = '', lastMy = '', nextHighlight = 0;
   const updateTilt = (elapsed: number, now: number) => {

@@ -2,7 +2,27 @@
 
 # Changelog
 
+New entries are grouped under Added, Changed, and Fixed, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version headings link to their GitHub releases. The display version and the browser update version are recorded separately so the latter can keep increasing for automatic updates.
+
 ## Unreleased
+
+### Added
+
+- Add a Following tab for recent uploads and a link to Bilibili rankings under Popular.
+- Add GitHub forms for bug reports and feature requests (#215).
+
+### Changed
+
+- Keep duration at the bottom right of the cover, give the creator a dedicated line, and align playback stats and post time underneath.
+- Stabilize the sticky category bar, render the account card at its display size, and refine the creator hover card.
+- Show the Original Site button as a compact icon and reveal its label on hover and keyboard focus (#211).
+- Apply the MARGIN theme to the native Add to Favorites and Set Group dialogs on watch pages (#214).
+
+### Fixed
+
+- Keep the native publish hit area stable during the press animation so clicks at the button edge reach the comment editor.
+- Reuse one collapse control for each comment thread and toggle only its own reply list (#209).
+- Preserve a full line for the nickname on the account card and wrap long UIDs inside their own area (#212).
 
 ## [v0.6.78](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.78) · Account card drag and motion settings
 
