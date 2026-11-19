@@ -25,7 +25,7 @@
   <a href="https://github.com/jiuyang5354/bilibili-margin/issues">Report an issue</a>
 </p>
 
-<p><a href="README.md">简体中文</a> | <strong>English</strong></p>
+<p><a href="README.md">简体中文</a> | <strong>English</strong> | <a href="README.ja.md">日本語</a></p>
 
 </div>
 
