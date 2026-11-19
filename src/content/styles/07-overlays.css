@@ -1,5 +1,5 @@
 /* ── 吸顶分类栏：液态玻璃胶囊（与顶栏同一套） ── */
-.bar-mark { height: 9px; margin-bottom: -9px; pointer-events: none; }
+.bar-mark { height: 6px; margin-bottom: -6px; pointer-events: none; }
 .bar .eyebrow { max-height: 20px; overflow: hidden; transition: opacity .2s var(--ease-out); }
 .bar .tabs, .bar .refresh { backdrop-filter: none; }
 .bar.stuck, .app:not([data-bg="off"]) .bar.stuck {

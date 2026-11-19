@@ -23,6 +23,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 - Keep the native publish hit area stable during the press animation so clicks at the button edge reach the comment editor.
 - Reuse one collapse control for each comment thread and toggle only its own reply list (#209).
 - Preserve a full line for the nickname on the account card and wrap long UIDs inside their own area (#212).
+- Align the first video row below the category bar after refreshing at a custom content zoom.
 
 ## [v0.6.78](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.78) · Account card drag and motion settings
 

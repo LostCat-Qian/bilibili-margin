@@ -602,7 +602,7 @@ export class MarginApp {
     const markTop = flowTop(mark), gridTop = flowTop(this.grid);
     if (markTop > gridTop) return Math.max(0, gridTop - sticky);
     // 多滚过完整标记，落在吸顶缓冲带外。
-    return Math.max(0, markTop - sticky + mark.getBoundingClientRect().height + 2);
+    return Math.max(0, markTop - sticky + mark.getBoundingClientRect().height + 1);
   }
 
   private refreshBusy(on: boolean): void {
