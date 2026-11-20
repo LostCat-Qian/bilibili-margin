@@ -1,6 +1,8 @@
 export const UPDATE_PENDING = 'margin:update-pending';
 export const UPDATE_SEEN = 'margin:update-seen';
 export const UPDATE_NOTES = [
+  "修复顶栏悬停底板和日月滑块对齐，补齐私信自动回复标识与消息设置入口。",
+  "动态内联评论和楼中楼支持点赞与取消点赞。",
   "修复楼中楼收起按钮重复和部分工牌昵称被裁切的问题。",
   "首页「原版」按钮默认收起文字，播放页收藏与分组弹窗跟随主题。",
   "首页增加关注新稿与热门排行榜入口，调整卡片统计和发布时间排版。",

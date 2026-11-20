@@ -205,7 +205,7 @@ export async function dynCommentTarget(d: Dyn): Promise<{ type: number; oid: str
   return { type: item.cmtType, oid: item.cmtOid };
 }
 
-export interface Reply { rpid: string; name: string; face: string; mid: number; text: string; richText?: DynText[]; like: number; ts: number; rcount: number; location?: string; top?: boolean }
+export interface Reply { rpid: string; name: string; face: string; mid: number; text: string; richText?: DynText[]; like: number; liked: boolean; ts: number; rcount: number; location?: string; top?: boolean }
 function toReply(r: any): Reply {
   return {
     rpid: String(r.rpid_str ?? r.rpid), name: r.member?.uname ?? '', face: https(r.member?.avatar), mid: Number(r.mid ?? r.member?.mid) || 0,
@@ -214,7 +214,7 @@ function toReply(r: any): Reply {
       const emoji = https(r.content?.emote?.[text]?.url);
       return { text, ...(/^https:\/\//.test(emoji) ? { emoji } : {}) };
     }),
-    like: r.like ?? 0, ts: r.ctime ?? 0, rcount: r.rcount ?? 0,
+    like: Math.max(Number(r.like) || 0, 0), liked: r.action === 1, ts: r.ctime ?? 0, rcount: r.rcount ?? 0,
     location: typeof r.reply_control?.location === 'string' ? r.reply_control.location.trim() || undefined : undefined,
   };
 }
@@ -242,4 +242,8 @@ export async function dynSubReplies(type: number, oid: string, root: string, pn:
 export async function dynReply(type: number, oid: string, message: string, target?: { root: string; parent: string }): Promise<Reply | null> {
   const data = await postForm<any>('/x/v2/reply/add', { type, oid, message, plat: 1, ...target });
   return data?.reply?.rpid_str || data?.reply?.rpid ? toReply(data.reply) : null;
+}
+
+export async function dynReplyLike(type: number, oid: string, rpid: string, liked: boolean): Promise<void> {
+  await postForm('/x/v2/reply/action', { type, oid, rpid, action: liked ? 1 : 0 });
 }

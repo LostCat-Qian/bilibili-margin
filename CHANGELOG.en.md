@@ -8,6 +8,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ### Added
 
+- Like and unlike inline dynamic comments and nested replies (#220).
 - Add a Following tab for recent uploads and a link to Bilibili rankings under Popular.
 - Add GitHub forms for bug reports and feature requests (#215).
 
@@ -20,6 +21,8 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ### Fixed
 
+- Show Bilibili's auto-reply indicators in conversations and messages, and link to the native message settings (#218).
+- Align the header hover indicator with its button when the shortcuts scroll, and center the theme thumb vertically in its track (#219).
 - Keep the native publish hit area stable during the press animation so clicks at the button edge reach the comment editor.
 - Reuse one collapse control for each comment thread and toggle only its own reply list (#209).
 - Preserve a full line for the nickname on the account card and wrap long UIDs inside their own area (#212).
