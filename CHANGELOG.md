@@ -6,6 +6,14 @@
 
 ## 未发布
 
+## [v0.6.83](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.83) · 直角亮暗拨杆
+
+扩展显示版本 0.6.83，包内更新版本 0.60.83。
+
+### 修复
+
+- 选择直角时，顶栏亮暗拨杆的滑块和玻璃高光随轨道变为直角。其他圆角档位继续使用圆形滑块。 (#221)
+
 ## [v0.6.82](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.82) · 首页搜索圆角与日文说明
 
 扩展显示版本 0.6.82，包内更新版本 0.60.82。

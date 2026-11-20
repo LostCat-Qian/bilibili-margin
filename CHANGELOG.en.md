@@ -6,6 +6,14 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.83](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.83) · Square theme switch
+
+Display version 0.6.83, browser update version 0.60.83.
+
+### Fixed
+
+- In the square corner setting, the theme switch thumb and glass highlight now match the square track. The other corner settings retain the circular thumb. (#221)
+
 ## [v0.6.82](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.82) · Home search corners and Japanese README
 
 Display version 0.6.82, browser update version 0.60.82.

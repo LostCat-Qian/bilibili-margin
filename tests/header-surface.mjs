@@ -20,7 +20,7 @@ try {
   const sw = ctx.serviceWorkers()[0] || await ctx.waitForEvent('serviceworker'), page = ctx.pages()[0];
   page.on('pageerror', e => errors.push(e.message));
   for (const theme of ['light', 'dark']) for (const glass of ['soft', 'liquid']) {
-    await sw.evaluate(s => chrome.storage.local.set({ 'margin:settings': s }), { theme, glass, intro: false });
+    await sw.evaluate(s => chrome.storage.local.set({ 'margin:settings': s }), { theme, glass, radius: glass === 'soft' ? 0 : 100, intro: false });
     for (const [name, url, host] of [
       ['home', 'https://www.bilibili.com/', '#margin-root'],
       ['watch', 'https://www.bilibili.com/video/BV1mdxN68E7F/', '#margin-watch-top'],
@@ -33,6 +33,13 @@ try {
         const app = document.querySelector(host)?.shadowRoot?.querySelector('.app');
         return app?.getAttribute('data-theme') === theme && app?.getAttribute('data-glass') === glass;
       }, { host, theme, glass });
+      const corners = await header.locator('.ts').evaluate(el => {
+        const thumb = el.querySelector('.ts-sm'), edge = el.querySelector('.ts-edge');
+        return [getComputedStyle(el.querySelector('.ts-c')).borderRadius, getComputedStyle(thumb).borderRadius,
+          getComputedStyle(edge, '::after').borderRadius];
+      });
+      const expected = glass === 'soft' ? '0px' : '999px';
+      assert.deepEqual(corners, [expected,expected,expected], name + '/' + theme + '/' + glass);
       await app.evaluate(e => {
         e.dataset.bg = 'image'; e.scrollTop = 240;
         const probe = document.createElement('div');
@@ -85,6 +92,19 @@ try {
   });
   assert(offsets.scroll > 0 && [offsets.x, offsets.y, offsets.orb].every(diff => Math.abs(diff) < 1), JSON.stringify(offsets));
   results.push({name:'aligned nav hover and theme switch after horizontal scrolling', ...offsets});
+  for (const radius of [0,50,100,150]) {
+    await sw.evaluate(async radius => {
+      const key = 'margin:settings';
+      const settings = (await chrome.storage.local.get(key))[key];
+      await chrome.storage.local.set({[key]:{...settings,radius}});
+    }, radius);
+    await page.waitForFunction(radius => {
+      const thumb = document.querySelector('#margin-root').shadowRoot.querySelector('.ts-sm');
+      const expected = 999 * radius / 100;
+      return parseFloat(getComputedStyle(thumb).borderRadius) === expected &&
+        parseFloat(getComputedStyle(thumb.querySelector('.ts-edge'),'::after').borderRadius) === expected;
+    }, radius);
+  }
   assert.deepEqual(errors, []);
 } finally {
   writeFileSync(join(out, 'results.json'), JSON.stringify({ results, errors }, null, 2));

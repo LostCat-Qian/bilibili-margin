@@ -1,6 +1,7 @@
 export const UPDATE_PENDING = 'margin:update-pending';
 export const UPDATE_SEEN = 'margin:update-seen';
 export const UPDATE_NOTES = [
+  "选择直角时，顶栏亮暗拨杆的滑块和玻璃高光也会切为直角。",
   "首页大搜索按钮随圆角设置对齐，展开联想列表时保留均匀留白。",
   "修复顶栏悬停底板和日月滑块对齐，补齐私信自动回复标识与消息设置入口。",
   "动态内联评论和楼中楼支持点赞与取消点赞。",
