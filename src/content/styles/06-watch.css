@@ -1,6 +1,10 @@
 /* 播放页顶栏：同一套 .app 变量，只占顶部 72px，抽屉仍覆盖全屏 */
 .app.wt { position: fixed; inset: 0 0 auto 0; height: 72px; overflow: visible; background: transparent; scrollbar-gutter: auto; }
 .app.wt .top { position: relative; }
+.app.wt .top:has(.et-labels) { display: flex; padding-inline: clamp(16px, 3vw, 64px); }
+.app.wt .top:has(.et-labels) .search { flex: 1 1 120px; max-width: 520px; }
+.app.wt .top:has(.et-labels) .acts { margin-left: auto; }
+.top .upload { flex: none; white-space: nowrap; }
 
 /* ── 液态玻璃顶栏（21st「Apple Liquid glass switcher」原生移植）──
    顶栏本身不再铺底色/模糊（父级 backdrop-filter 会挡住子级的折射），

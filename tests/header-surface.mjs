@@ -92,6 +92,22 @@ try {
   });
   assert(offsets.scroll > 0 && [offsets.x, offsets.y, offsets.orb].every(diff => Math.abs(diff) < 1), JSON.stringify(offsets));
   results.push({name:'aligned nav hover and theme switch after horizontal scrolling', ...offsets});
+  // A settings reorder can move the selected anchor while the nav width stays fixed.
+  await page.mouse.move(0,0);
+  const selected = quick.locator('.et-btn').filter({hasText:'分区'}).first();
+  await selected.evaluate(b => {
+    b.dispatchEvent(new PointerEvent('pointerenter',{pointerType:'mouse'}));
+  });
+  await sw.evaluate(async () => {
+    const key = 'margin:settings';
+    const old = (await chrome.storage.local.get(key))[key];
+    await chrome.storage.local.set({[key]:{...old,headOrder:['直播','大会员','分区']}});
+  });
+  await page.waitForFunction(() => {
+    const nav = document.querySelector('#margin-root').shadowRoot.querySelector('.et');
+    const b = [...nav.querySelectorAll('.et-btn')].find(el => el.querySelector('span').textContent === '分区');
+    return b.style.order === '2' && Math.abs(nav.querySelector('.et-thumb').getBoundingClientRect().x-b.getBoundingClientRect().x)<1;
+  },null,{timeout:3000});
   for (const radius of [0,50,100,150]) {
     await sw.evaluate(async radius => {
       const key = 'margin:settings';
@@ -104,6 +120,18 @@ try {
       return parseFloat(getComputedStyle(thumb).borderRadius) === expected &&
         parseFloat(getComputedStyle(thumb.querySelector('.ts-edge'),'::after').borderRadius) === expected;
     }, radius);
+  }
+  await sw.evaluate(async () => {
+    const key = 'margin:settings', old = (await chrome.storage.local.get(key))[key];
+    await chrome.storage.local.set({[key]:{...old,headLabels:true}});
+  });
+  await page.setViewportSize({width:1920,height:960});
+  for (const url of ['https://www.bilibili.com/video/BV1mdxN68E7F/','https://live.bilibili.com/3']) {
+    await page.goto(url,{waitUntil:'domcontentloaded'});
+    const menu = page.locator('#margin-watch-top .et-labels');
+    await menu.waitFor();
+    assert.ok(await menu.evaluate(el=>el.scrollWidth <= el.clientWidth + 1),'wide header clipped its shortcuts');
+    assert.equal(await page.locator('#margin-watch-top .upload').evaluate(el=>getComputedStyle(el).whiteSpace),'nowrap');
   }
   assert.deepEqual(errors, []);
 } finally {

@@ -22,6 +22,7 @@ export interface ExpandableTabs {
   thumb: HTMLElement;
   buttons: HTMLElement[];
   select(i: number | null): void;
+  place(): void;
   /** 角标：0 隐藏；数字超过 99 显示 99+；dot=true 只显示小圆点 */
   badge(id: string, n: number, dot?: boolean): void;
 }
@@ -106,5 +107,5 @@ export function createExpandableTabs(items: TabItem[], onChange?: (i: number | n
     b.setAttribute('aria-label', `${b.querySelector('span')?.textContent ?? ''}（${n > 99 ? '99+' : n} 条新）`);
   };
 
-  return { el, thumb, buttons, select, badge };
+  return { el, thumb, buttons, select, badge, place };
 }

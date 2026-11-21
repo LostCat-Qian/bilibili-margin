@@ -193,6 +193,22 @@ for (const theme of THEMES) {
       writeFileSync(join(OUT,'background-activity.json'),JSON.stringify({mode:'forced GL test path, not physical GPU FPS',samples},null,2));return miss;
     });
 
+    await feature('home-block-preview', async () => {
+      await reset(); await page.goto(HOME,{waitUntil:'domcontentloaded'});
+      const cover=page.locator('#margin-root .card .cover').first();
+      const button=cover.locator('.card-block');
+      await button.hover();
+      const before=await button.boundingBox();
+      await cover.evaluate(el=>el.classList.add('playing'));
+      const after=await button.boundingBox();
+      if (!before || !after || Math.abs(before.width-after.width)>1 || !await button.locator('span').isVisible())
+        return ['block button or label shrank during preview'];
+      const pages=ctx.pages().length;
+      await button.locator('span').click();
+      await page.getByText(/^已屏蔽「/).first().waitFor();
+      return ctx.pages().length===pages ? [] : ['block opened a video'];
+    });
+
     await feature('home-classic-layout', async () => {
       await reset(); await page.goto(HOME, { waitUntil:'domcontentloaded' });
       await page.locator('#margin-root .main .hero-search').waitFor();

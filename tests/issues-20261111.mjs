@@ -74,14 +74,14 @@ try {
   });
   const pop = page.locator('.dp[aria-label="正在直播"]');
   await check('直播更多失败保留已有内容，支持点击重试且不自动重复请求', async () => {
-    await pop.getByRole('button', { name: '加载更多', exact: true }).click();
+    await pop.locator('.dp-list').hover(); await page.mouse.wheel(0, 1000);
     await pop.getByRole('button', { name: '加载失败，重试', exact: true }).waitFor();
     assert.equal(await pop.locator('.dp-row').count(), 8); assert.equal(liveRequests, 1);
     liveFails = false; await pop.getByRole('button', { name: '加载失败，重试', exact: true }).click();
     await pop.locator('.dp-row').nth(15).waitFor(); assert.equal(liveRequests, 2);
   });
   await check('直播逐批展开并去重，第二批不重复请求完整列表', async () => {
-    await pop.getByRole('button', { name: '加载更多', exact: true }).click();
+    await pop.locator('.dp-list').hover(); await page.mouse.wheel(0, 1000);
     await pop.locator('.dp-row').nth(18).waitFor();
     const hrefs = await pop.locator('.dp-row').evaluateAll(nodes => nodes.map(n => n.getAttribute('href')));
     assert.equal(new Set(hrefs).size, 19); assert.equal(liveRequests, 2); assert.equal(await pop.locator('.dp-more').count(), 0);

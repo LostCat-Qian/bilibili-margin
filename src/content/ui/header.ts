@@ -143,7 +143,8 @@ export function createHeader(o: { tabs: TabItem[]; onTheme: () => void; onSearch
       b.style.order = personal || siteIdx.has(t) ? String(order.indexOf(t)) : '30';
     }
     tabsNav.el.querySelectorAll<HTMLElement>('.et-sep').forEach((x) => { x.style.order = '20'; x.hidden = personal || tabsNav.buttons.every((b) => b.hidden || !siteIdx.has(b.querySelector('span')?.textContent ?? '')); });
-    tabsNav.el.querySelector<HTMLElement>('.et-thumb')?.style.setProperty('order', '-1');
+    tabsNav.thumb.style.order = '-1';
+    if (tabsNav.thumb.hasAttribute('data-on')) tabsNav.place();
   };
   loadSettings().then(applyPrefs).catch(() => {});
   onSettingsChange((n, p) => { if (n.headLabels !== p.headLabels || n.headHide.join() !== p.headHide.join() || n.headOrder.join() !== p.headOrder.join()) applyPrefs(n); });

@@ -6,6 +6,21 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.84](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.84) · 2026-11-21 · Card actions, live navigation and update notes
+
+Display version 0.6.84, browser update version 0.60.84.
+
+### Changed
+
+- Scroll to the end of the header live list to load the next batch, with a manual retry on failure (#223).
+- Group the update notice by category, show only this version and link to the full changelog (#213).
+
+### Fixed
+
+- Reposition the visible header hover indicator when shortcuts are reordered (#219).
+- Keep the block-creator label and hit area stable when a home cover preview starts (#222).
+- Use available width for labeled video and live headers, keep Upload on one line, and improve contrast for live gift controls in dark mode (#223).
+
 ## [v0.6.83](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.83) · Square theme switch
 
 Display version 0.6.83, browser update version 0.60.83.
