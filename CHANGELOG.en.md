@@ -6,6 +6,18 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.86](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.86) · 2026-11-22 · Compact footprints and glass corners
+
+Display version 0.6.86, browser update version 0.60.86.
+
+### Changed
+
+- The homepage shows the last seven days of activity when only 0–2 days are active over the past year and no year/month view was explicitly chosen. Expanding the calendar remembers your choice. With three active days the full view appears automatically. Activity counting is unchanged (#226).
+
+### Fixed
+
+- Liquid-glass controls update their refraction when the corner setting changes, including when switching to square corners (#226).
+
 ## [v0.6.85](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.85) · 2026-11-21 · Favorite folder actions
 
 Display version 0.6.85, browser update version 0.60.85.
