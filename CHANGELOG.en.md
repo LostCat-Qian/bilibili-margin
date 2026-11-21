@@ -6,6 +6,18 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.85](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.85) · 2026-11-21 · Favorite folder actions
+
+Display version 0.6.85, browser update version 0.60.85.
+
+### Added
+
+- Start continuous playback from a favorite folder on a profile. Owners can also open the same folder on Bilibili to use its native bulk management tools.
+
+### Changed
+
+- The message settings link now explicitly identifies Bilibili's native settings, which open in a new tab (#218).
+
 ## [v0.6.84](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.84) · 2026-11-21 · Card actions, live navigation and update notes
 
 Display version 0.6.84, browser update version 0.60.84.

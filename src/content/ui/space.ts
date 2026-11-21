@@ -18,7 +18,7 @@ import { targetOfVideo, targetOfDyn } from '../filter-targets';
 import type { FilterTarget } from '../filter';
 import { openBili } from '../navigation';
 import { spaceArticles, spaceAudio, type SpaceContent } from '../api/space-content';
-import { publicFolders, publicFolder, folderVideos, type Folder } from '../api/fav';
+import { publicFolders, publicFolder, folderPlayUrl, folderUrl, folderVideos, type Folder } from '../api/fav';
 import { nav } from '../api/http';
 import { favoriteActions } from './favorite-actions';
 
@@ -424,6 +424,15 @@ export class SpaceApp {
       h('button', { class: 'ghost small', type: 'button', onclick: () => {
         this.folder = null; history.replaceState(null, '', `/${this.mid}/favlist`); this.reload();
       } }, icon(ICONS.back), '收藏夹'), h('h2', {}, folder.title));
+    const link = { target: '_blank', rel: 'noopener' };
+    if (folder.count > 0) {
+      this.collectionHead.append(h('a', { class: 'btn small fav-play-all', href: folderPlayUrl(folder), ...link }, '播放全部'));
+    }
+    void nav().then(user => {
+      if (this.folder === folder && user.isLogin && user.mid === folder.mid) {
+        this.collectionHead.append(h('a', { class: 'ghost small', href: folderUrl(folder) + '&margin=off', ...link }, '原版批量管理'));
+      }
+    }).catch(() => { /* 登录状态不可用时只提供播放入口 */ });
     this.reload();
   }
 
@@ -547,6 +556,7 @@ export class SpaceApp {
               folder.count = Math.max(0, folder.count - 1);
               if (gen === this.gen) {
                 card.remove();
+                if (!folder.count) this.collectionHead.querySelector('.fav-play-all')?.remove();
                 if (!this.list.children.length && this.done) this.status.replaceChildren(h('span', {}, '暂无可播放视频'));
               }
             }));
