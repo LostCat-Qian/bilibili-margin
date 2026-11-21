@@ -4,7 +4,7 @@
 .app.wt .top:has(.et-labels) { display: flex; padding-inline: clamp(16px, 3vw, 64px); }
 .app.wt .top:has(.et-labels) .search { flex: 1 1 120px; max-width: 520px; }
 .app.wt .top:has(.et-labels) .acts { margin-left: auto; }
-.top .upload { flex: none; white-space: nowrap; }
+.app.wt .top:has(.et-labels) .upload { flex: none; white-space: nowrap; }
 
 /* ── 液态玻璃顶栏（21st「Apple Liquid glass switcher」原生移植）──
    顶栏本身不再铺底色/模糊（父级 backdrop-filter 会挡住子级的折射），
