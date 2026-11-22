@@ -6,6 +6,14 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.87](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.87) · 2026-11-22 · Playback speed
+
+Display version 0.6.87, browser update version 0.60.87.
+
+### Fixed
+
+- Keep the speed chosen with X, C or Z when the same video reloads in the player. A subsequent speed change in the native player takes precedence (#225).
+
 ## [v0.6.86](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.86) · 2026-11-22 · Compact footprints and glass corners
 
 Display version 0.6.86, browser update version 0.60.86.
