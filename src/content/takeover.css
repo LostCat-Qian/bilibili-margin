@@ -654,3 +654,11 @@ a.wh-card:hover { box-shadow: var(--ring), var(--sh-sm); transform: translateY(-
 }
 .dy[data-href] .dy-acts { cursor: default; }
 .dy-r.mine .dy-r-b { padding-left: 40px; }
+
+.dy-comment-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; border: 0; margin: 6px 0; padding: 0; }
+.dy-comment-tools :is(.dy-picker,.dy-attachments):not(:empty) { flex-basis: 100%; }
+.dy-picker { padding: 8px; border-radius: 8px; background: var(--surface); }
+.dy-picker[hidden] { display: none; }
+.dy-emoji-choices { display: flex; flex-wrap: wrap; gap: 4px; max-height: 150px; overflow: auto; margin-top: 6px; }
+.dy-emoji-choices button { min-width: 30px; min-height: 30px; }
+.dy-emoji-choices img { width: 24px; height: 24px; object-fit: contain; }

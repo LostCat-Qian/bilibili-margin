@@ -294,15 +294,21 @@ export class WatchSkin {
       }
     };
     // v0.43 网页全屏可滚动：播放器改成贴在文档顶端的 absolute，下面的评论接着排
+    let webHeading: ResizeObserver | null = null;
+    let webFrame = 0;
     const webScroll = (on: boolean) => {
       if (!on) {
+        webHeading?.disconnect(); webHeading = null;
+        cancelAnimationFrame(webFrame); webFrame = 0;
         if (de.classList.contains('margin-webscroll')) { de.classList.remove('margin-webscroll'); for (const k of ['y', 'x', 'w', 'h']) de.style.removeProperty(`--m-ws-${k}`); }
         return;
       }
       const wrap = document.querySelector<HTMLElement>('.player-wrap, #bilibili-player-wrap, .bilibili-player-wrap');
       if (!wrap) return;
-      const was = de.classList.contains('margin-webscroll');
-      requestAnimationFrame(() => {
+      if (webFrame) return;
+      webFrame = requestAnimationFrame(() => {
+        webFrame = 0;
+        const was = de.classList.contains('margin-webscroll');
         if (playerScreen() !== 'web' || document.fullscreenElement || !this.settings.webScroll) return;
         if (!was) de.classList.add('margin-webscroll');
         // 先按 0 偏移算 player-wrap 的文档坐标，再把播放器拉回文档左上角
@@ -313,6 +319,13 @@ export class WatchSkin {
         de.style.setProperty('--m-ws-x', `${-left}px`);
         de.style.setProperty('--m-ws-w', `${de.clientWidth}px`);
         de.style.setProperty('--m-ws-h', `${Math.max(0, innerHeight - top)}px`);
+        if (!webHeading) {
+          const title = document.querySelector('.video-info-container');
+          if (title) {
+            webHeading = new ResizeObserver(() => webScroll(true));
+            webHeading.observe(title);
+          }
+        }
         if (!was) scrollTo({ top: 0 });
       });
     };

@@ -6,6 +6,17 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.91](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.91) · 2026-11-22
+
+### Added
+
+- Opt-in playback controls for individual scenarios. Feed comments support emoji, mentions from followed accounts and pasted images. Native comment boxes accept image paste when the native upload tool is available.
+- Added a native owner-view shortcut on your own space.
+
+### Fixed
+
+- Live channels appear above followed accounts. Scrollable web fullscreen tracks video heading height changes.
+
 ## [v0.6.90](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.90) · 2026-11-22 · Manual update checks
 
 Display version 0.6.90, browser update version 0.60.90.

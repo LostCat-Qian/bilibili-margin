@@ -61,14 +61,13 @@ export class FeedApp {
     const sidebar = this.shell.settings.feedLayout === 'sidebar';
     app.classList.toggle('fd-sidebar', sidebar);
     const left = app.querySelector('.fd-left');
-    const right = app.querySelector('.fd-right');
     const bar = app.querySelector('.fd-bar');
     if (sidebar) { if (this.strip.parentElement !== left) left?.append(this.strip); }
     else if (this.strip.nextElementSibling !== bar) bar?.before(this.strip);
     const live = app.querySelector('.fd-live');
-    const liveParent = sidebar ? right : left;
-    if (live && live.parentElement !== liveParent) liveParent?.append(live);
     const follows = app.querySelector<HTMLElement>('.fd-follows');
+    const firstFollow = sidebar ? this.strip : follows;
+    if (live && left && (live.parentElement !== left || (firstFollow && live.nextElementSibling !== firstFollow))) left.insertBefore(live, firstFollow);
     if (follows) follows.hidden = sidebar || !this.shell.settings.feedFollowList;
   }
 

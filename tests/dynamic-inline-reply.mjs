@@ -18,6 +18,8 @@ let release, reject = false;
 try {
   await installMocks(context, raw => {
     const p = new URL(raw).pathname;
+    if (p === '/x/emote/user/panel/web') return {code:0,data:{packages:[{id:1,text:'默认',emote:[{text:'[支持]',url:'//i0.hdslb.com/ok.png',flags:{unlocked:0}}]}]}};
+    if (p === '/x/relation/followings/search') return {code:0,data:{list:[{mid:710,uname:'测试关注',face:''}]}};
     if (p.endsWith('/feed/all')) return { code: 0, data: { items: [{ id_str: '8101', type: 'DYNAMIC_TYPE_WORD', basic: { comment_type: 17, comment_id_str: '8101' }, modules: { module_author: { mid: 1, name: '动态作者', pub_ts: 1 }, module_dynamic: { desc: { text: '内联回复测试' } }, module_stat: { comment: { count: 2 }, like: { count: 0 }, forward: { count: 0 } } } }], has_more: false } };
     if (p === '/x/v2/reply') return { code: 0, data: { replies: [row(root, '主评论作者', '主评论正文', 1), row('90071992547409939', '暂无回复作者', '零回复主评论')], page: { count: 2, size: 8 } } };
     if (p === '/x/v2/reply/reply') return { code: 0, data: { replies: [{ ...row(child, '楼中楼作者', '楼中楼正文'), action: 1, like: 2 }], page: { count: 1, size: 10 } } };
@@ -71,6 +73,34 @@ try {
   assert.equal(await input.inputValue(), '发送期间新草稿'); assert.match(await card.locator('.dy-reply-context').textContent(), /主评论作者/);
   assert.equal(await emptyThread.locator('.dy-replies-toggle').getAttribute('aria-expanded'), 'true');
   results.push('a previously empty thread accepts replies and completion preserves a newer target and draft');
+  await card.getByRole('button',{name:'取消回复'}).click();
+  await input.fill('');
+  await card.getByRole('button',{name:'表情',exact:true}).click();
+  await card.getByRole('button',{name:'[支持]',exact:true}).click();
+  await card.getByRole('button',{name:'@ 提及'}).click();
+  await card.getByRole('searchbox',{name:'搜索已关注的 UP 主'}).fill('测试');
+  await card.getByRole('button',{name:'测试关注',exact:true}).click();
+  const uploaded = [];
+  await context.addCookies([{name:'bili_jct',value:'mock',domain:'.bilibili.com',path:'/'}]);
+  await context.route('**/draw/upload_bfs', async route => {
+    uploaded.push(route.request().postDataBuffer().toString());
+    await route.fulfill({json:{code:0,data:{image_url:'https://i0.hdslb.com/test.png',image_width:32,image_height:32}}});
+  });
+  await input.evaluate(el => {
+    const transfer = new DataTransfer(); transfer.items.add(new File(['fixture'],'pasted.png',{type:'image/png'}));
+    el.dispatchEvent(new ClipboardEvent('paste',{clipboardData:transfer,bubbles:true,cancelable:true}));
+  });
+  await card.getByRole('button',{name:'移除 pasted.png'}).waitFor();
+  assert.equal(uploaded.length,0);
+  const sent = page.waitForRequest(req => req.url().includes('/x/v2/reply/add'));
+  await card.locator('.dy-send').click(); await sent;
+  assert.equal(posts.at(-1).message,'[支持]@测试关注');
+  assert.deepEqual(JSON.parse(posts.at(-1).at_name_to_mid),{'测试关注':710});
+  assert.equal(JSON.parse(posts.at(-1).pictures)[0].img_width,32);
+  assert.match(uploaded[0],/new_dyn/);
+  release();
+  await card.getByRole('button',{name:'移除 pasted.png'}).waitFor({state:'hidden'});
+  results.push('comment emoji, mention UID and pasted picture submit together');
   const rootLike = main.locator(':scope > .dy-r-b > .dy-r-meta > .dy-r-like');
   const childLike = nested.locator('.dy-r-like');
   assert.equal(await rootLike.getAttribute('aria-pressed', { timeout: 3000 }), 'false');

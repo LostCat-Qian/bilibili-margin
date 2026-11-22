@@ -99,6 +99,7 @@ for (const app of [true, false]) {
       }
       assert.equal(await folders.count(), 23);
       assert.match(await folders.first().textContent(), /私密/);
+      assert.equal(await page.getByRole('link', {name:'原版本人视角'}).getAttribute('href'), 'https://space.bilibili.com/1?margin=off');
       const following = page.locator('.sp-stat[href*="/relation/follow"]');
       assert.equal(new URL(await following.getAttribute('href')).searchParams.get('margin'), 'off');
       assert.equal(new URL(await page.locator('.sp-native-following').getAttribute('href')).searchParams.get('margin'), 'off');
@@ -106,6 +107,7 @@ for (const app of [true, false]) {
       const before = completeReads;
       await page.goto('https://space.bilibili.com/2/favlist');
       await page.getByText('没有公开的收藏夹', { exact: true }).waitFor();
+      assert.equal(await page.getByRole('link',{name:'原版本人视角'}).count(), 0);
       assert.equal(completeReads, before, 'other users must not use the owner-only fallback');
       checks.push('202 own privacy fallback keeps private folders and later pages; native follow/bangumi links; no other-user fallback');
       privateSpace = false;

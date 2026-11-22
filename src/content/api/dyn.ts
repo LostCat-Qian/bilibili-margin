@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { DynamicPicture } from './dynamic-publish';
 import { getJSON, postForm, postJSON } from './http';
 import { parseCountText, parseDurationText } from '../parse';
 import type { Video } from './feed';
@@ -205,11 +206,12 @@ export async function dynCommentTarget(d: Dyn): Promise<{ type: number; oid: str
   return { type: item.cmtType, oid: item.cmtOid };
 }
 
-export interface Reply { rpid: string; name: string; face: string; mid: number; text: string; richText?: DynText[]; like: number; liked: boolean; ts: number; rcount: number; location?: string; top?: boolean }
+export interface Reply { rpid: string; name: string; face: string; mid: number; text: string; richText?: DynText[]; pictures?: string[]; like: number; liked: boolean; ts: number; rcount: number; location?: string; top?: boolean }
 function toReply(r: any): Reply {
   return {
     rpid: String(r.rpid_str ?? r.rpid), name: r.member?.uname ?? '', face: https(r.member?.avatar), mid: Number(r.mid ?? r.member?.mid) || 0,
     text: r.content?.message ?? '',
+    pictures: (Array.isArray(r.content?.pictures) ? r.content.pictures : []).map((p: any) => https(p?.img_src)).filter((url: string) => /^https:\/\/([a-z0-9-]+\.)*(hdslb\.com|biliimg\.com)\//i.test(url)),
     richText: String(r.content?.message ?? '').split(/(\[[^\]\r\n]+\])/g).filter(Boolean).map((text) => {
       const emoji = https(r.content?.emote?.[text]?.url);
       return { text, ...(/^https:\/\//.test(emoji) ? { emoji } : {}) };
@@ -239,8 +241,10 @@ export async function dynSubReplies(type: number, oid: string, root: string, pn:
   const list: Reply[] = (d.replies ?? []).map(toReply);
   return { list, more: list.length > 0 && pn * (d.page?.size || ps) < (d.page?.count ?? 0) };
 }
-export async function dynReply(type: number, oid: string, message: string, target?: { root: string; parent: string }): Promise<Reply | null> {
-  const data = await postForm<any>('/x/v2/reply/add', { type, oid, message, plat: 1, ...target });
+export async function dynReply(type: number, oid: string, message: string, target?: { root: string; parent: string }, extra?: { mentions: Record<string, number>; pictures: DynamicPicture[] }): Promise<Reply | null> {
+  const data = await postForm<any>('/x/v2/reply/add', { type, oid, message, plat: 1, ...target,
+    ...(extra && Object.keys(extra.mentions).length ? { at_name_to_mid: JSON.stringify(extra.mentions) } : {}),
+    ...(extra?.pictures.length ? { pictures: JSON.stringify(extra.pictures) } : {}), });
   return data?.reply?.rpid_str || data?.reply?.rpid ? toReply(data.reply) : null;
 }
 

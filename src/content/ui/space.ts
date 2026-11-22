@@ -312,6 +312,7 @@ export class SpaceApp {
         return b;
       };
       acts.replaceChildren(
+        h('a', { class: 'sp-msg', href: 'https://space.bilibili.com/' + i.mid + '?margin=off', target: '_blank', rel: 'noopener' }, '原版本人视角'),
         tile('收藏夹', ICONS.fav, () => openPanel('fav', 'https://www.bilibili.com/#fav')),
         tile('历史记录', ICONS.history, () => openPanel('hist', 'https://www.bilibili.com/history')),
         tile('稍后再看', ICONS.later, () => openPanel('later', 'https://www.bilibili.com/#later')));
