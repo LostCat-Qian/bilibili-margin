@@ -6,6 +6,14 @@
 
 ## 未发布
 
+## [v0.6.90](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.90) · 2026-11-22 · 手动更新检查
+
+扩展显示版本 0.6.90，包内更新版本 0.60.90。
+
+### 修复
+
+- 手动检查更新遇到 GitHub API 限流时，可以授权读取映间的官方发布页。此权限可选，自动检查不会请求授权（#234）。
+
 ## [v0.6.89](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.89) · 2026-11-22 · 分区与界面对齐
 
 扩展显示版本 0.6.89，包内更新版本 0.60.89。

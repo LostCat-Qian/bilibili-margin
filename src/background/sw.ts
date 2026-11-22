@@ -86,9 +86,14 @@ async function handleApp(m: AppMessage): Promise<unknown> {
 
 type OpenVideoTabMessage = { margin: 'open-video-tab'; bvid: string };
 
-chrome.runtime.onMessage.addListener((m: FpMessage | AppMessage | SponsorMessage | HistoryMessage | WeatherLocationMessage | OpenVideoTabMessage, sender, reply) => {
-  if (!m || !['app', 'fp', 'sponsor', 'privacy', 'weather-location', 'open-video-tab'].includes(m.margin)) return;
+chrome.runtime.onMessage.addListener((m: FpMessage | AppMessage | SponsorMessage | HistoryMessage | WeatherLocationMessage | OpenVideoTabMessage | { margin: 'open-release-check' }, sender, reply) => {
+  if (!m || !['app', 'fp', 'sponsor', 'privacy', 'weather-location', 'open-video-tab', 'open-release-check'].includes(m.margin)) return;
   if (!trustedSender(sender, chrome.runtime.id)) { reply({ ok: false, error: '消息来源无效' }); return; }
+  if (m.margin === 'open-release-check') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html#release-check') })
+      .then(() => reply({ ok: true }), () => reply({ ok: false }));
+    return true;
+  }
   if (m.margin === 'open-video-tab') {
     if (!sender.tab || typeof m.bvid !== 'string' || !/^BV[0-9A-Za-z]{10}$/.test(m.bvid)) {
       reply({ ok: false });

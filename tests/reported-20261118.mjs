@@ -17,7 +17,7 @@ for (const app of [true, false]) {
     args: [...(app ? ['--app=data:text/html,margin-regression'] : []), `--disable-extensions-except=${ext}`, `--load-extension=${ext}`],
   });
   try {
-    let privateSpace = false, completeReads = 0, releaseReads = 0, releaseFailure = false;
+    let privateSpace = false, completeReads = 0, releaseReads = 0, releaseStatus = 200;
     const folderReads = [];
     await installMocks(context, address => {
       const u = new URL(address);
@@ -117,7 +117,7 @@ for (const app of [true, false]) {
       await context.route('https://api.github.com/repos/jiuyang5354/bilibili-margin/releases/latest', async route => {
         releaseReads++;
         await new Promise(resolve => setTimeout(resolve, 150));
-        await route.fulfill({ status: releaseFailure ? 503 : 200, json: { tag_name: `v${next}`, name: '下一正式版', html_url: `https://github.com/jiuyang5354/bilibili-margin/releases/tag/v${next}` }, headers: { 'access-control-allow-origin': 'https://www.bilibili.com' } });
+        await route.fulfill({ status: releaseStatus, json: { tag_name: `v${next}`, name: '下一正式版', html_url: `https://github.com/jiuyang5354/bilibili-margin/releases/tag/v${next}` }, headers: { 'access-control-allow-origin': 'https://www.bilibili.com' } });
       });
       await page.goto('https://www.bilibili.com/');
       await page.getByRole('button', { name: '设置', exact: true }).click();
@@ -134,12 +134,27 @@ for (const app of [true, false]) {
       await settings.getByRole('link', { name: '下一正式版 · 查看新版', exact: true }).waitFor();
       assert.equal(releaseReads, 1, 'manual check bypasses cached older result and blocks duplicate requests');
       const saved = await worker.evaluate(async () => (await chrome.storage.local.get('margin:update-check'))['margin:update-check']);
-      releaseFailure = true; await check.click();
+      releaseStatus = 503; await check.click();
       await settings.getByText('检查失败，请稍后重试或查看更新日志。', { exact: true }).waitFor();
       assert(await settings.getByText('检查失败，请稍后重试或查看更新日志。', { exact: true }).evaluate(el => el.getBoundingClientRect().bottom <= el.closest('.stg-body').getBoundingClientRect().bottom + 1), 'update feedback must be visible inside the settings scroll area');
       assert.equal(releaseReads, 2);
       assert.deepEqual(await worker.evaluate(async () => (await chrome.storage.local.get('margin:update-check'))['margin:update-check']), saved);
       await settings.screenshot({ path: join(out, 'update-check.png') });
+      releaseStatus = 429;
+      await check.click();
+      const permissionPage = context.waitForEvent('page');
+      await settings.getByRole('button', { name: '通过官方发布页检查' }).click();
+      const consent = await permissionPage;
+      await consent.waitForURL('**/popup.html#release-check');
+      await consent.getByRole('button', { name: '授权并检查' }).waitFor();
+      assert.equal(await consent.evaluate(() => chrome.permissions.contains({ origins:['https://github.com/*'] })), false);
+      await consent.evaluate(() => { chrome.permissions.request = async () => false; });
+      await consent.getByRole('button', { name: '授权并检查' }).click();
+      await consent.getByText('未授权，可直接查看官方发布页。', { exact:true }).waitFor();
+      assert.equal(releaseReads, 3);
+      assert.deepEqual(await worker.evaluate(async () => (await chrome.storage.local.get('margin:update-check'))['margin:update-check']), saved);
+      await consent.close();
+      checks.push('234 manual rate limit opens an extension page; denial preserves cache');
       checks.push('204 settings check respects privacy, bypasses cache, prevents duplicate requests and keeps cached results on failure');
     }
   } finally { await context.close(); }

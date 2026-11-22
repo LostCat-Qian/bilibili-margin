@@ -14,7 +14,7 @@ import { appPoll, appQr, appRemember, appRevoke, appState } from '../api/appfeed
 import { clearLoc, loadLoc, savedLoc, setLoc as setLocWithName } from '../api/weather';
 import { createCityPicker } from './city-picker';
 import { forgetSearch } from '../api/search-history';
-import { checkRelease, newerRelease } from '../../shared/releases';
+import { checkRelease, newerRelease, ReleaseRateLimited } from '../../shared/releases';
 
 export interface SettingsPanel { sheet: SettingsPage; sync(s: Settings): void }
 
@@ -604,7 +604,13 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
         updateStatus.replaceChildren(h('a', { href: release.url, target: '_blank', rel: 'noopener noreferrer' }, `${release.name || `v${release.tag}`} · 查看新版`));
       } else updateStatus.textContent = newerRelease(chrome.runtime.getManifest().version, release.tag) ? '当前版本高于最新正式版' : '当前已是最新正式版';
     } catch (error) {
-      updateStatus.textContent = (error as Error).name === 'PrivacyBlocked'
+      if (error instanceof ReleaseRateLimited) {
+        const fallback = h('button', { type: 'button', class: 'ghost small', onclick: async () => {
+          const opened = await chrome.runtime.sendMessage({ margin: 'open-release-check' }).catch(() => null);
+          if (!opened?.ok) updateStatus.textContent = '无法打开发布页检查，请查看更新日志。';
+        } }, '通过官方发布页检查');
+        updateStatus.replaceChildren('GitHub 更新接口已限流。', fallback);
+      } else updateStatus.textContent = (error as Error).name === 'PrivacyBlocked'
         ? '外部服务已关闭，可在隐私分类开启，或通过更新日志查看。'
         : '检查失败，请稍后重试或查看更新日志。';
     } finally {

@@ -6,6 +6,14 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.90](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.90) · 2026-11-22 · Manual update checks
+
+Display version 0.6.90, browser update version 0.60.90.
+
+### Fixed
+
+- When GitHub rate-limits a manual update check, you can grant optional access to look up the official release page. Automatic checks never request this permission (#234).
+
 ## [v0.6.89](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.89) · 2026-11-22 · TV channel and control alignment
 
 Display version 0.6.89, browser update version 0.60.89.
