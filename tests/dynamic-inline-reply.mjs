@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { EventEmitter, once } from 'node:events';
 import { chromium } from 'playwright';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -32,9 +33,10 @@ try {
     if (form.rpid === root) await new Promise(resolve => { acceptLike = resolve; notifyLike(); });
     await route.fulfill({ json: form.rpid === root ? { code: 0 } : { code: -101, message: '模拟未登录' } });
   });
+  const submissions = new EventEmitter();
   await context.route('**/x/v2/reply/add', async route => {
     const form = Object.fromEntries(new URLSearchParams(route.request().postData())); posts.push(form);
-    await new Promise(resolve => { release = resolve; });
+    await new Promise(resolve => { release = resolve; submissions.emit('received'); });
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify(reject ? { code: -400, message: '模拟发送失败' } : { code: 0, data: { reply: row(`9007199254740994${posts.length}`, '我', form.message) } }) });
   });
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
@@ -44,10 +46,14 @@ try {
   const card = page.locator('.fd-list > .dy:not(.sk)').first();
   await card.getByRole('button', { name: /^评论 / }).click();
   const main = card.locator('.dy-rlist > .dy-r').filter({ has: page.getByText('主评论正文', { exact: true }) }), input = card.getByRole('textbox', { name: '发表评论' });
+  const send = () => Promise.all([
+    once(submissions, 'received', { signal: AbortSignal.timeout(5000) }),
+    card.locator('.dy-send').click(),
+  ]);
   await main.locator('.dy-r-reply').first().click();
   assert.match(await card.locator('.dy-reply-context').textContent(), /主评论作者/);
   await page.screenshot({ path: join(out, 'reply-selected.png') });
-  await input.fill('回复主评论'); await card.locator('.dy-send').click();
+  await input.fill('回复主评论'); await send();
   await page.waitForFunction(() => document.getElementById('margin-root').shadowRoot.querySelector('.dy-send')?.getAttribute('aria-busy') === 'true');
   await card.locator('.dy-send').evaluate(button => button.click()); await input.press('Enter');
   await page.waitForTimeout(80); assert.equal(posts.length, 1);
@@ -57,16 +63,16 @@ try {
   const nested = main.locator('.dy-sublist > .dy-r').filter({ hasText: '楼中楼正文' });
   if (!await nested.count()) { await main.locator('.dy-replies-toggle').click(); }
   await nested.locator('.dy-r-reply').click(); await input.fill('失败草稿'); reject = true;
-  await card.locator('.dy-send').click(); await page.waitForTimeout(80); assert.equal(posts[1].root, root); assert.equal(posts[1].parent, child);
+  await send(); assert.equal(posts[1].root, root); assert.equal(posts[1].parent, child);
   release(); await card.getByText(/发布失败/).waitFor(); assert.equal(await input.inputValue(), '失败草稿');
   assert.match(await card.locator('.dy-reply-context').textContent(), /楼中楼作者/); results.push('nested reply uses root and parent separately and rejection retains its target and draft');
   await card.getByRole('button', { name: '取消回复', exact: true }).click();
   assert.equal(await input.inputValue(), '失败草稿'); assert(await card.locator('.dy-reply-context').isHidden());
-  reject = false; await card.locator('.dy-send').click(); await page.waitForTimeout(80);
+  reject = false; await send();
   assert.equal(posts[2].root, undefined); assert.equal(posts[2].parent, undefined); release();
   await card.locator('.dy-rlist > .dy-r').filter({ has: page.getByText('失败草稿', { exact: true }) }).waitFor(); results.push('cancel keeps the draft and restores a top-level comment');
   const emptyThread = card.locator('.dy-rlist > .dy-r').filter({ has: page.getByText('零回复主评论', { exact: true }) });
-  await emptyThread.locator('.dy-r-reply').click(); await input.fill('新增第一条回复'); await card.locator('.dy-send').click(); await page.waitForTimeout(80);
+  await emptyThread.locator('.dy-r-reply').click(); await input.fill('新增第一条回复'); await send();
   assert.equal(posts[3].root, '90071992547409939');
   await main.locator(':scope > .dy-r-b > .dy-r-meta > .dy-r-reply').click(); await input.fill('发送期间新草稿');
   release(); await emptyThread.getByText('新增第一条回复', { exact: true }).waitFor();
@@ -92,8 +98,7 @@ try {
   });
   await card.getByRole('button',{name:'移除 pasted.png'}).waitFor();
   assert.equal(uploaded.length,0);
-  const sent = page.waitForRequest(req => req.url().includes('/x/v2/reply/add'));
-  await card.locator('.dy-send').click(); await sent;
+  await send();
   assert.equal(posts.at(-1).message,'[支持]@测试关注');
   assert.deepEqual(JSON.parse(posts.at(-1).at_name_to_mid),{'测试关注':710});
   assert.equal(JSON.parse(posts.at(-1).pictures)[0].img_width,32);
