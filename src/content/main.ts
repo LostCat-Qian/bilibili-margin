@@ -106,7 +106,8 @@ function hideOriginal(): HTMLStyleElement {
   return hide;
 }
 
-const isHome = () => location.hostname === 'www.bilibili.com' && /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/?)?(?:index\.html)?$/.test(location.pathname);
+// /tv/ is the drama channel, even though "tv" has the shape of a locale prefix.
+const isHome = () => location.hostname === 'www.bilibili.com' && /^\/(?!tv(?:\/|$))(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/?)?(?:index\.html)?$/.test(location.pathname);
 
 const isWatch = () => location.hostname === 'www.bilibili.com' && /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/)?(?:video\/(?:BV|av)|list\/(?:ml\d|watchlater|\d))/i.test(location.pathname);
 const isSearch = () => location.hostname === 'search.bilibili.com';

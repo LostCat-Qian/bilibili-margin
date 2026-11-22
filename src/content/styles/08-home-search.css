@@ -129,6 +129,11 @@
 }
 .hd-settings:hover { color: var(--ink); background: var(--chip); }
 .hd-settings svg { width: 18px; height: 18px; }
+.home .hd-settings { width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--line); }
+.home .hd-settings:hover { background: var(--chip); }
+@media (max-width: 900px) {
+  .home .top .acts { gap: 6px; }
+}
 
 /* 收藏夹：新建卡（和玻璃文件夹同宽同高，虚线框；点开变表单） */
 .fav-new { width: 236px; height: 222px; margin-top: 36px; border-radius: 16px; }

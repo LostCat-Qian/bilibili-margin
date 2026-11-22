@@ -6,6 +6,15 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.89](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.89) · 2026-11-22 · TV channel and control alignment
+
+Display version 0.6.89, browser update version 0.60.89.
+
+### Fixed
+
+- The TV drama channel now opens its own page from the header instead of loading the home feed (#230).
+- Align the home settings button with the theme switch, give timestamps a separate row on narrow cards, and restore the native danmaku list header spacing and arrow alignment (#233).
+
 ## [v0.6.88](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.88) · 2026-11-22 · Native search, glass surfaces and first-day footprints
 
 Display version 0.6.88, browser update version 0.60.88.

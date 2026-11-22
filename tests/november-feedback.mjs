@@ -22,6 +22,35 @@ try {
  const worker=ctx.serviceWorkers()[0]||await ctx.waitForEvent('serviceworker');
  await worker.evaluate(()=>chrome.storage.local.set({'margin:settings':{theme:'dark',intro:false,bg:{mode:'off'}}}));
  const page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));
+ await check('230-tv-channel-is-not-a-localized-homepage', async () => {
+   for (const path of ['/tv', '/tv/']) {
+     await page.goto('https://www.bilibili.com' + path);
+     await page.locator('#margin-watch-top, #margin-root .app.home').first().waitFor();
+     assert.equal(await page.locator('#margin-root .app.home').count(), 0, path);
+   }
+   await page.goto('https://www.bilibili.com/zh-Hans/');
+   await page.locator('#margin-root .app.home').waitFor();
+ });
+ await check('233-home-settings-aligns-with-theme-switch', async () => {
+   await page.goto('https://www.bilibili.com/');
+   const top = page.locator('#margin-root .top');
+   const settings = await top.getByRole('button', {name:'设置',exact:true}).boundingBox();
+   const toggle = await top.locator('.ts').boundingBox();
+   assert.equal(settings.height, toggle.height);
+   assert.equal(settings.y, toggle.y);
+ });
+ await check('233-home-card-date-wraps-as-one-unit', async () => {
+   const card = page.locator('.home-grid .card').filter({ has: page.locator('.meta .pubtime') }).first();
+   await card.waitFor();
+   for (const width of [220, 400]) {
+     await card.evaluate((el, width) => { el.style.width = width + 'px'; }, width);
+     const stats = await card.locator('.stat').first().boundingBox();
+     const date = await card.locator('.pubtime').boundingBox();
+     if (width === 220) assert(date.y >= stats.y + stats.height);
+     else assert(Math.abs(date.y - stats.y) < 5);
+     assert(await card.locator('.pubtime').evaluate(el => el.scrollWidth <= el.clientWidth));
+   }
+ });
  await page.goto('https://message.bilibili.com/#/whisper');
  await page.locator('#margin-root .wh-s').first().click();
  const input=page.locator('#margin-root .wh-input');await input.waitFor();

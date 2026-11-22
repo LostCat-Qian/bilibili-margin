@@ -361,8 +361,7 @@ html.margin-watch .upinfo-btn-panel > .default-btn { transition: transform .15s 
 html.margin-watch .upinfo-btn-panel > .default-btn:active { transform: scale(.97); }
 
 /* 弹幕列表：一行 44px 的标题条 */
-html.margin-watch #danmukuBox .bui-collapse-header { height: 44px !important; line-height: 44px !important; padding: 0 16px !important; }
-html.margin-watch #danmukuBox .bui-collapse-header :is(.danmaku-title, .bui-collapse-title, span) { font-size: 14px !important; font-weight: 600; color: var(--m-ink) !important; }
+html.margin-watch #danmukuBox .bui-collapse-header :is(.danmaku-title, .bui-collapse-title, .bui-dropdown-name) { font-size: 14px !important; font-weight: 600; color: var(--m-ink) !important; }
 
 /* 选集：编号目录 + 进度 */
 html.margin-watch .video-pod { padding: 16px 8px 8px !important; box-shadow: 0 1px 2px rgb(0 0 0 / .04); }

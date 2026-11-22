@@ -45,7 +45,7 @@ export function videoCard(v: Video, index: number, opts: CardOpts = {}): HTMLEle
       h('a', { class: 'title', href, target: '_blank', rel: 'noopener', title: v.title }, v.title),
       metaRow(v, opts),
       opts.inlineTime ? null : pubTime(v, opts),
-      v.reason && v.reason !== '已关注' && !opts.hide?.has('reason') ? h('span', { class: 'reason' }, v.reason) : null,
+      v.reason && v.reason !== '已关注' && !opts.hide?.has('reason') ? h('span', { class: 'reason', title: v.reason }, v.reason) : null,
     ),
   );
   cardData.set(el, v);
