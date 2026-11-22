@@ -33,6 +33,7 @@ import { uiReducedMotion as reducedMotion } from '../motion';
 import { ThemeWriter } from './theme-writer';
 import css from '../styles/index';
 import { mountUpdateNotice } from './update-notice';
+import { mountUpdateReminder } from './update-reminder';
 import { attachNavigationGlass } from './navigation-glass';
 
 type Tab = 'rcmd' | 'popular' | 'following' | 'classic';
@@ -403,6 +404,7 @@ export class MarginApp {
     hashOpen();
     addEventListener('hashchange', hashOpen);
     mountUpdateNotice(this.app);
+    mountUpdateReminder(this.app);
 
     this.load();
   }

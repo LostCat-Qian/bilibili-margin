@@ -49,6 +49,10 @@ function paint(s: Settings): void {
   const manifest = chrome.runtime.getManifest();
   $('#ver').textContent = manifest.version_name || manifest.version;
   let s = await loadSettings();
+  const hours = s.updateInterval;
+  (document.getElementById('cycle') as HTMLElement).textContent = hours
+    ? `更新提醒：${hours === 24 ? '每天' : hours === 168 ? '每周' : hours < 24 ? `每 ${hours} 小时` : `每 ${hours / 24} 天`}`
+    : '更新提醒已关闭，可在设置里开启';
   for (const page of REDESIGN_PAGES) {
     const row = document.createElement('div'); row.className = 'row';
     const label = document.createElement('span'); label.textContent = REDESIGN_LABELS[page];
