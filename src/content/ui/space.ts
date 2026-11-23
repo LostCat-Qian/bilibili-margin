@@ -1,7 +1,7 @@
 import type { Settings } from '../../shared/settings';
 import { invalidateFollowStatus } from '../api/follow-status';
 import { block, follow, followTags, setUserTags, userTags, spaceInfo, spaceLive, spaceRecent, spaceVideos, spaceCollections, spaceCollectionVideos, createSpaceSearch, type SpaceCollection, type SpaceInfo, type VideoKind, type VideoOrder } from '../api/space';
-import { spaceDynamics } from '../api/dyn';
+import { deleteSpaceDynamic, spaceDynamics } from '../api/dyn';
 import { videoCard, skeleton } from './card';
 import { dynCard, dynData } from './dyn';
 import { segmented, toast } from './controls';
@@ -642,12 +642,30 @@ export class SpaceApp {
         this.done = r.list.length === 0 || this.list.children.length >= r.total;
         if (!this.list.children.length) this.status.replaceChildren(h('span', {}, this.collection ? '暂无公开视频' : this.kind === 'charging' ? (this.q ? `没有找到「${this.q}」相关的充电视频` : '没有充电专属视频') : '还没有投稿'));
       } else {
-        const r = await spaceDynamics(this.mid, this.offset);
+        const [r, viewer] = await Promise.all([spaceDynamics(this.mid, this.offset), nav().catch(() => null)]);
         if (gen !== this.gen) return;
         skNodes.forEach((n) => (n as Element).remove());
         this.offset = r.offset;
         r.list.forEach((d) => {
           const card = dynCard(d);
+          if (viewer?.isLogin && this.mid === viewer.mid && d.mid === viewer.mid && /^\d+$/.test(d.id) && (d.editable || d.deleteParams)) {
+            const tools = h('span', { class: 'dy-manage' });
+            if (d.editable) tools.append(h('a', { class: 'ghost small', href: 'https://t.bilibili.com/' + d.id + '?margin=off#margin-edit', target: '_blank', rel: 'noopener' }, '编辑'));
+            if (d.deleteParams) {
+              const remove = h('button', { type: 'button', class: 'ghost small' }, '删除') as HTMLButtonElement;
+              remove.onclick = async () => {
+                if (remove.disabled || !confirm('确定删除这条动态吗？删除后无法恢复。')) return;
+                remove.disabled = true;
+                try {
+                  await deleteSpaceDynamic(d);
+                  card.remove();
+                  if (gen === this.gen && this.done && !this.list.children.length) this.status.replaceChildren(h('span', {}, '还没有动态'));
+                } catch (e) { remove.disabled = false; toast(this.shell.app, (e as Error).message); }
+              };
+              tools.append(remove);
+            }
+            card.querySelector(':scope > .dy-eyebrow > .dy-open')?.replaceWith(tools);
+          }
           card.toggleAttribute('data-margin-filtered', !this.allows(targetOfDyn(d)));
           this.list.append(card);
         });

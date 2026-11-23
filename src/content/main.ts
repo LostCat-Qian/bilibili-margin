@@ -481,4 +481,23 @@ function checkConflicts(): void {
 }
 if (!offByUrl()) checkConflicts();
 
+// The original editor is opened by the detail page's own menu, not a standalone URL.
+if (window.top === window && location.hostname === 't.bilibili.com' && /^\/\d+\/?$/.test(location.pathname) && offByUrl() && location.hash === '#margin-edit') {
+  history.replaceState(history.state, '', location.pathname + location.search);
+  const selector = '#app > .content > .card > .bili-dyn-item > .bili-dyn-item__main > .bili-dyn-item__header .bili-dyn-more';
+  let opened: Element | null = null;
+  const observer = new MutationObserver(showEditor);
+  function showEditor() {
+    const menu = document.querySelector(selector);
+    if (!menu) return;
+    const edit = Array.from(menu.querySelectorAll<HTMLElement>('.bili-cascader-options__item-label')).find(el => /^(编辑|编辑动态)$/.test(el.textContent?.trim() || ''));
+    if (edit) { observer.disconnect(); edit.click(); return; }
+    const trigger = menu.querySelector('.bili-dyn-more__btn');
+    if (trigger && opened !== trigger) { opened = trigger; trigger.dispatchEvent(new MouseEvent('mouseenter')); }
+  }
+  observer.observe(document.documentElement, { subtree: true, childList: true });
+  showEditor();
+  setTimeout(() => observer.disconnect(), 8000);
+}
+
 start().catch((e) => console.error("[MARGIN]", e));

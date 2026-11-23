@@ -115,6 +115,7 @@ html.margin-reduce .sp-menu { animation: none; }
 .dy:first-child { padding-top: 12px; }
 .dy-eyebrow { display: flex; align-items: center; gap: 16px; font: 500 11px/1 var(--mono); letter-spacing: .06em; color: var(--faint); margin-bottom: 16px; }
 .dy-kind { color: var(--accent-text); letter-spacing: .16em; }
+.dy-manage { display: inline-flex; margin-left: auto; gap: 6px; }
 .dy-open { margin-left: auto; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--faint); transition: background-color .2s var(--ease-out), color .2s var(--ease-out); }
 .dy-open:hover { background: var(--chip); color: var(--ink); }
 .dy-open svg { width: 15px; height: 15px; }

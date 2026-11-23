@@ -32,6 +32,7 @@ export interface Dyn {
   orig?: Dyn | null;
   stat: { comment: number; forward: number; like: number };
   url: string;
+  editable?: boolean; deleteParams?: Record<string, unknown>;
   /** v0.50 动态页直接互动：自己是否已赞、评论区 type/oid */
   liked?: boolean; cmtType?: number; cmtOid?: string;
 }
@@ -59,6 +60,12 @@ export function toDyn(it: any): Dyn | null {
     url: `https://www.bilibili.com/opus/${it.id_str}`,
     liked: s.like?.status === true, cmtType: Number(it.basic?.comment_type) || undefined, cmtOid: it.basic?.comment_id_str || undefined,
   };
+  const menu = m.module_more?.three_point_items;
+  if (Array.isArray(menu)) {
+    out.editable = it.basic?.editable === true && menu.some(item => item.type === 'THREE_POINT_EDIT');
+    const remove = menu.find(item => item.type === 'THREE_POINT_DELETE');
+    if (remove) out.deleteParams = remove.params ?? {};
+  }
   if (major.archive) {
     const v = major.archive;
     const ad = v.is_ad === true || Boolean(v.ad_info) || Boolean(v.business_info) || undefined;
@@ -117,6 +124,11 @@ export async function dynReserve(id: string, reserve: DynReserve): Promise<strin
   if (result.desc_update !== undefined && reserve.desc2) reserve.desc2.text = result.desc_update;
   if (result.reserve_update !== undefined) reserve.reserve_total = result.reserve_update;
   return result.toast || (result.final_btn_status === 2 ? '预约成功' : '已取消预约');
+}
+
+export async function deleteSpaceDynamic(d: Dyn): Promise<void> {
+  if (!d.deleteParams || !/^\d+$/.test(d.id)) throw new Error('当前动态不可删除');
+  await postJSON('/x/dynamic/feed/operate/remove', { ...d.deleteParams, dyn_id_str: d.id }, { platform: 'web' });
 }
 
 export async function spaceDynamics(mid: number, offset: string): Promise<{ list: Dyn[]; offset: string; more: boolean }> {

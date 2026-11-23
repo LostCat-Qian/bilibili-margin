@@ -115,6 +115,7 @@
 .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); font: 11px/1 var(--mono); letter-spacing: .12em; color: var(--faint); }
 .home-exit { position: fixed; left: 16px; bottom: 16px; z-index: 18; min-height: 36px; min-width: 36px; justify-content: center; gap: 0; padding-inline: 9px; border-radius: 99px; background: var(--surface); box-shadow: var(--ring), var(--sh-sm); }
 .home-exit > span { display: none; white-space: nowrap; }
+.home-exit:is(:hover, :focus-visible) { color: var(--ink); background: var(--surface); }
 .home-exit:focus-visible { gap: 6px; padding-inline: 12px; }
 .home-exit:focus-visible > span { display: inline; }
 @media (hover: hover) {

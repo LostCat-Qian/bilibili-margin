@@ -6,6 +6,18 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+### Added
+
+- Open the native editor or confirm deletion from your own space feed when the post allows the action (#240).
+
+### Changed
+
+- Settings group headings have larger, heavier text and higher contrast (#239).
+
+### Fixed
+
+- Keep the home exit control opaque on hover and keyboard focus, and keep the settings button square in narrow headers (#237).
+
 ## [v0.6.92](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.92) · 2026-11-22 · Update reminders
 
 Display version 0.6.92, browser update version 0.60.92.

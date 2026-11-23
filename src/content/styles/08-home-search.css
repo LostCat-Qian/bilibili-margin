@@ -120,6 +120,8 @@
   place-items: center;
   width: 36px;
   height: 36px;
+  flex: none;
+  padding: 0;
   border: 0;
   border-radius: 50%;
   background: none;
@@ -130,7 +132,7 @@
 .hd-settings:hover { color: var(--ink); background: var(--chip); }
 .hd-settings svg { width: 18px; height: 18px; }
 .home .hd-settings { width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--line); }
-.home .hd-settings:hover { background: var(--chip); }
+.home .hd-settings:hover { background: color-mix(in srgb, var(--ink) 8%, var(--surface)); }
 @media (max-width: 900px) {
   .home .top .acts { gap: 6px; }
 }

@@ -197,6 +197,11 @@ try {
     await seed({}); await page.goto('https://www.bilibili.com/');
     const exit = page.getByRole('button', { name: '本次回到 B 站原版首页', exact: true });
     await exit.waitFor();
+    await exit.hover();
+    await page.waitForFunction(() => {
+      const button = document.querySelector('#margin-root').shadowRoot.querySelector('.home-exit');
+      return getComputedStyle(button).backgroundColor.startsWith('rgb(') && getComputedStyle(button.querySelector('span')).display !== 'none';
+    }, null, { timeout: 1500 });
     const rect = await exit.boundingBox();
     assert(rect.y >= 0 && rect.y + rect.height <= 900, JSON.stringify(rect));
     await page.locator('#margin-root .app').evaluate(app => { app.scrollTop = 800; });
