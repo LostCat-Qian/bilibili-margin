@@ -53,7 +53,8 @@ try {
       await pop.locator('.card-later[data-state="ok"]').first().waitFor();
       assert.equal(laterRequests.length, before + 1);
       assert.match(laterRequests.at(-1), /^BV/);
-      assert.equal(await button.getAttribute('aria-label'), '已加入稍后再看');
+      assert.equal(await button.getAttribute('aria-label'), '取消稍后再看');
+      assert.equal(await button.getAttribute('aria-pressed'), 'true');
       const addedPosition = await button.boundingBox();
       assert(Math.abs(position.y - addedPosition.y) < 1, 'button moved after adding');
       assert.equal(context.pages().length, tabs); assert.equal(page.url(), href);
@@ -68,7 +69,7 @@ try {
         await button.and(page.getByRole('button', { name: '重试添加', exact: true })).waitFor();
       } finally { rejectLater = false; }
       await button.click();
-      await button.and(page.getByRole('button', { name: '已加入稍后再看', exact: true })).waitFor();
+      await button.and(page.getByRole('button', { name: '取消稍后再看', exact: true, pressed: true })).waitFor();
     });
     await page.keyboard.press('Escape'); await page.mouse.move(5, 850);
     await check(`drop-search-${name}`, async () => {
