@@ -42,7 +42,8 @@ for (const app of [true, false]) {
         await page.goto('https://www.bilibili.com/');
         const card = page.locator('#margin-root .home-grid .card:not(.sk)').first();
         await card.waitFor(); await card.locator('.cover').hover();
-        const button = card.locator(selector);
+        if (selector !== '.card-later') await card.locator('.card-more').click();
+        const button = selector === '.card-later' ? card.locator(selector) : page.getByRole('menuitem', {name: selector === '.card-block' ? /^不看「/ : '不感兴趣'});
         await button.waitFor({ state: 'visible' });
         const previous = context.pages().length;
         await button.click(); await page.waitForTimeout(400);

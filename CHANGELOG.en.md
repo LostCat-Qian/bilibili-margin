@@ -6,6 +6,19 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+### Added
+
+- Choose which feed opens on the homepage. The new Posts filter in the activity feed includes text, image posts and articles.
+
+### Fixed
+
+- Homepage cards group negative feedback actions in the More menu and preserve the scroll position when filtering.
+- Mesh and Aurora backgrounds prefer high precision and bound noise inputs on devices limited to medium precision.
+
+### Changed
+
+- Animated wallpaper on video pages renders at up to 30 fps, or 24 fps in listening mode.
+
 ## [v0.6.103](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.103) · 2026-11-23 · Video credits, profile reporting and Watch Later
 
 ### Fixed

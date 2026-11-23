@@ -162,6 +162,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   void loadLoc().then(paintCity, () => say('天气位置读取失败，请重试'));
   const cityBox = cityPicker.el;
   const cols = segmented<string>([['0', '自动'], ['4', '4 个'], ['5', '5 个'], ['6', '6 个']], String(s0.cols), (v) => save({ cols: Number(v) as 0 | 4 | 5 | 6 }));
+  const homeDefaultTab = segmented<Settings['homeDefaultTab']>([['rcmd', '推荐'], ['popular', '热门'], ['following', '关注'], ['classic', '关注老片']], s0.homeDefaultTab, (v) => save({ homeDefaultTab: v }));
   const homeWidth = segmented<Settings['homeWidth']>([['current', '当前宽度'], ['compact', '居中收窄'], ['fluid', '自适应铺开']], s0.homeWidth, (v) => save({ homeWidth: v }));
   const fontS = segmented<'serif' | 'sans'>([['serif', '衬线'], ['sans', '无衬线']], s0.titleFont, (v) => save({ titleFont: v }));
   const monoT = toggle(s0.monoNum, '数字用等宽字体', (v) => save({ monoNum: v }));
@@ -687,6 +688,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       block('天气城市', '选中候选固定城市；点击「自动」恢复 IP 定位', cityBox),
       block('卡片信息', '首页视频卡片下面显示哪些，点一下开关', cardBits)),
     block('每行视频', '自动按窗口宽度排 6–8 个；也可以固定 4 / 5 / 6 个，卡片更大', cols),
+    block('首页默认分区', '下次打开首页时显示', homeDefaultTab),
     block('内容宽度', '当前保持 2024px 上限；收窄到 1600px 居中；自适应利用大屏宽度。小窗口沿用原布局', homeWidth),
     block('版块顺序', '上移 / 下移调整首页版块；修改后立即生效', orderBox),
     row('批次导航', '每次「换一批」只加载一页，底部左右箭头切换批次；开启后推荐页不再随滚动自动补页', batchNavT),
@@ -721,7 +723,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
 
   sheet.section('filter', '内容过滤', '屏蔽不想看的内容。',
     block('屏蔽关键词', '标题或视频标签包含即隐藏（首页、搜索、播放页推荐、动态等全站生效）', kw),
-    block('屏蔽 UP 主', '卡片右上角也能一键屏蔽', ups),
+    block('屏蔽 UP 主', '可从视频卡片的「更多」菜单屏蔽', ups),
     drawer('播放量与时长', () => '',
       block('最低播放量', null, views),
       block('最短时长', null, dur)),
@@ -797,6 +799,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       msgT.setAttribute('aria-checked', String(s.msgRemind));
       adsT.setAttribute('aria-checked', String(s.hideAds));
       cols.set(String(s.cols));
+      homeDefaultTab.set(s.homeDefaultTab);
       homeWidth.set(s.homeWidth);
       fontS.set(s.titleFont);
       monoT.setAttribute('aria-checked', String(s.monoNum));

@@ -87,6 +87,7 @@ export interface Settings {
   replyTree: boolean;
   /** 首页每行几个视频：0 = 按窗口宽度自动，4 / 5 = 固定 */
   cols: 0 | 4 | 5 | 6;
+  homeDefaultTab: 'rcmd' | 'popular' | 'following' | 'classic';
   homeWidth: 'current' | 'compact' | 'fluid';
   /** 点击「推荐 / 热门 / 关注老片」分类标签刷新列表 */
   tabRefresh: boolean;
@@ -197,6 +198,7 @@ export const DEFAULTS: Settings = {
   speedKeys: true,
   replyTree: true,
   cols: 0,
+  homeDefaultTab: 'rcmd',
   homeWidth: 'current',
   tabRefresh: false,
   batchNav: false,
@@ -282,6 +284,7 @@ function merge(raw: Partial<Settings> | undefined): Settings {
     headLabels: r.headLabels === true,
     feedLayout: r.feedLayout === 'sidebar' ? 'sidebar' : 'classic',
     zoom: r.zoom === 110 || r.zoom === 120 ? r.zoom : 100,
+    homeDefaultTab: r.homeDefaultTab === 'popular' || r.homeDefaultTab === 'following' || r.homeDefaultTab === 'classic' ? r.homeDefaultTab : 'rcmd',
     homeWidth: r.homeWidth === 'compact' || r.homeWidth === 'fluid' ? r.homeWidth : 'current',
     tabRefresh: r.tabRefresh === true,
     batchNav: r.batchNav === true,
@@ -375,6 +378,7 @@ export function sanitizeSettings(raw: unknown): Settings | null {
   if (r.zoom === 100 || r.zoom === 110 || r.zoom === 120) out.zoom = r.zoom;
   if (r.titleFont === 'serif' || r.titleFont === 'sans') out.titleFont = r.titleFont;
   if (r.cols === 0 || r.cols === 4 || r.cols === 5 || r.cols === 6) out.cols = r.cols;
+  if (r.homeDefaultTab === 'rcmd' || r.homeDefaultTab === 'popular' || r.homeDefaultTab === 'following' || r.homeDefaultTab === 'classic') out.homeDefaultTab = r.homeDefaultTab;
   if (r.homeWidth === 'current' || r.homeWidth === 'compact' || r.homeWidth === 'fluid') out.homeWidth = r.homeWidth;
   if (typeof r.playerCorners === 'boolean') out.playerCorners = r.playerCorners;
   if (typeof r.autoplayExt === 'boolean') out.autoplayExt = r.autoplayExt;

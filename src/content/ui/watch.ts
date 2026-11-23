@@ -58,6 +58,7 @@ export class WatchSkin {
   constructor(private settings: Settings, private kind: SkinKind = 'watch') {
     const de = document.documentElement;
     const isWatch = kind === 'watch';
+    if (isWatch) this.bg.cap(30);
     // 全局换皮样式（watch.css + pages.css）由入口脚本在 document_start 挂上（见 main.ts skinStyle），这里只补类名
     de.classList.add('margin-skin', `margin-${kind}`);
 
@@ -165,7 +166,7 @@ export class WatchSkin {
   private async openMusic(): Promise<void> {
     try {
       this.music ??= import('./music-mode').then(module => module.createMusicMode(active => {
-        this.bg.cap(active ? 24 : 0);
+        this.bg.cap(active ? 24 : 30);
         this.screenSync?.();
       }, () => { void this.toggleTheme(); }));
       (await this.music).open();

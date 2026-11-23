@@ -15,7 +15,8 @@ import { targetOfDyn } from '../filter-targets';
 import { uiReducedMotion as reducedMotion } from '../motion';
 import { createDynamicComposer } from './dynamic-composer';
 
-const TYPES: [FeedType, string][] = [['all', '全部'], ['video', '视频投稿'], ['pgc', '追番追剧'], ['article', '专栏']];
+type FeedTab = FeedType | 'posts';
+const TYPES: [FeedTab, string][] = [['all', '全部'], ['posts', '图文'], ['video', '视频投稿'], ['pgc', '追番追剧'], ['article', '专栏']];
 const ext = { target: '_blank', rel: 'noopener' };
 const face = (src: string, cls: string, w = 96) => h('img', { class: cls, src: src ? `${src}@${w}w_${w}h_1c.webp` : '', alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
 
@@ -26,7 +27,7 @@ const face = (src: string, cls: string, w = 96) => h('img', { class: cls, src: s
  */
 export class FeedApp {
   readonly shell: PageShell;
-  private type: FeedType;
+  private type: FeedTab;
   private host = 0;
   private offset = '';
   private done = false;
@@ -44,7 +45,7 @@ export class FeedApp {
     this.shell = new PageShell(settings, 'feed');
     document.title = '动态 · 映间';
     const t = new URLSearchParams(location.search).get('tab');
-    this.type = t === 'video' || t === 'pgc' || t === 'article' ? t : 'all';
+    this.type = t === 'posts' || t === 'video' || t === 'pgc' || t === 'article' ? t : 'all';
     this.render();
   }
 
@@ -282,7 +283,7 @@ export class FeedApp {
       h('li', {}, h('a', { href: `https://search.bilibili.com/all?keyword=${encodeURIComponent(x.keyword)}`, ...ext }, h('i', { class: i < 3 ? 'hot' : '' }, String(i + 1).padStart(2, '0')), h('span', {}, x.name))))));
   }
 
-  private setType(t: FeedType): void {
+  private setType(t: FeedTab): void {
     if (t === this.type) return;
     this.type = t;
     this.tabs.querySelectorAll<HTMLElement>('.tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
@@ -301,27 +302,35 @@ export class FeedApp {
   }
 
   private async load(): Promise<void> {
-    if (this.loading || this.done) return;
+    if (this.loading || this.done || this.status.firstElementChild) return;
     this.loading = true;
     const gen = this.gen;
     const sk = Array.from({ length: this.offset ? 1 : 3 }, () => h('article', { class: 'dy sk' }, h('div', { class: 'line short' }), h('div', { class: 'line' }), h('div', { class: 'line' })));
     this.list.append(...sk);
     try {
-      const r = await followFeed(this.host ? 'all' : this.type, this.offset, this.host);
+      const r = await followFeed(this.host || this.type === 'posts' ? 'all' : this.type, this.offset, this.host);
       if (gen !== this.gen) return;
       // 动态里转发的视频也按标签过滤：先预热标签，再编译保留条件
-      await this.shell.filter.prepare(r.list.map((d) => d.video?.bvid));
+      const items = this.type === 'posts'
+        ? r.list.filter(d => ['DYNAMIC_TYPE_WORD', 'DYNAMIC_TYPE_DRAW', 'DYNAMIC_TYPE_ARTICLE'].includes(d.type))
+        : r.list;
+      await this.shell.filter.prepare(items.map((d) => d.video?.bvid));
       if (gen !== this.gen) return;
       sk.forEach((n) => n.remove());
       const keep = compileDynFilter(this.shell.settings.filters, cachedTags);
-      r.list.filter(keep).forEach((d) => {
+      const shown = items.filter(keep);
+      shown.forEach((d) => {
         const card = dynCard(d, false, true);
         card.toggleAttribute('data-margin-filtered', !this.shell.filter.allows(targetOfDyn(d)));
         this.list.append(card);
       });
+      this.done = !r.more || !r.offset || r.offset === this.offset;
       this.offset = r.offset;
-      this.done = !r.more || !r.offset;
-      if (!this.list.children.length) this.list.append(h('div', { class: 'ms-empty' }, h('p', {}, '这里还空着')));
+      if (this.type === 'posts' && !shown.length && !this.done) {
+        this.status.replaceChildren(h('button', { type: 'button', class: 'ghost', onclick: () => { this.status.replaceChildren(); void this.load(); } }, '继续查找图文'));
+        return;
+      }
+      if (this.done && !this.list.children.length) this.list.append(h('div', { class: 'ms-empty' }, h('p', {}, '这里还空着')));
       else if (this.done) this.status.textContent = '— 到底了 —';
     } catch (e) {
       if (gen !== this.gen) return;
