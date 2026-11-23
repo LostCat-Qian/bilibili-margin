@@ -77,6 +77,16 @@ try {
   await again.waitForTimeout(1500);
   assert.equal(await again.locator('#margin-root').getByText(`映间有新版本 v${nextVersion}`).count(), 0);
   results.push('看过一次之后不再重复提醒');
+  await worker.evaluate(async () => {
+    const key = 'margin:settings';
+    const settings = (await chrome.storage.local.get(key))[key];
+    await chrome.storage.local.set({ [key]: { ...settings, updateInterval: 0 } });
+  });
+  await until(() => worker.evaluate(async () =>
+    !(await chrome.alarms.get('margin:update-check')) &&
+    !(await chrome.storage.local.get('margin:update-reminder'))['margin:update-reminder'] &&
+    (await chrome.action.getBadgeText({})) === ''), '关闭后清理提醒');
+  results.push('关闭后清除任务、提醒与角标');
   assert.deepEqual(errors, []);
 } finally {
   await context.close();

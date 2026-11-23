@@ -26,18 +26,23 @@ const alarmApi = () => chrome.alarms as unknown as AlarmApi;
 const getAlarm = (name: string) => new Promise<chrome.alarms.Alarm | undefined>(resolve => alarmApi().get(name, resolve));
 const clearAlarm = (name: string) => new Promise<boolean>(resolve => alarmApi().clear(name, resolve));
 
-/** 商店安装的版本由浏览器自己更新，不用我们管 */
-export function storeManaged(): boolean {
-  return Boolean((chrome.runtime.getManifest() as chrome.runtime.Manifest & { update_url?: string }).update_url);
+async function enabledInterval(): Promise<number> {
+  const settings = await loadSettings();
+  if (!settings.enabled || !settings.privacyExternal || !settings.updateInterval || chrome.runtime.getManifest().update_url) return 0;
+  try {
+    const self = await chrome.management.getSelf();
+    return self.installType === 'development' ? settings.updateInterval : 0;
+  } catch { return 0; }
 }
 
 /** 按当前设置重建定时任务；周期为 0 时把任务撤掉 */
 export async function syncSchedule(): Promise<void> {
-  const settings = await loadSettings();
-  const hours = settings.updateInterval;
+  const hours = await enabledInterval();
   const existing = await getAlarm(ALARM);
   if (!hours) {
     if (existing) await clearAlarm(ALARM);
+    if (await readReminder()) await clearReminder();
+    await clearBadge();
     return;
   }
   const period = hours * 60;
@@ -60,10 +65,10 @@ async function clearBadge(): Promise<void> {
 
 /** 一次完整的检查：发现新版本 → 记下来 → 打角标 */
 export async function runCheck(): Promise<void> {
-  const settings = await loadSettings();
-  if (!settings.enabled || !settings.privacyExternal || !settings.updateInterval || storeManaged()) return;
+  if (!await enabledInterval()) return;
   let info;
   try { info = await checkRelease(true); } catch { return; }
+  if (!await enabledInterval()) return;
   const current = chrome.runtime.getManifest().version;
   if (!newerRelease(info.tag, current)) {
     // 已经追上了：清掉提醒与角标
@@ -89,4 +94,11 @@ export async function initReminder(): Promise<void> {
     await clearReminder();
     await clearBadge();
   }
+}
+
+export async function claimReminder() {
+  const state = await readReminder();
+  if (!state || state.seen || !newerRelease(state.tag, chrome.runtime.getManifest().version) || !await enabledInterval()) return null;
+  await writeReminder({ ...state, seen: true });
+  return state;
 }

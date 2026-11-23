@@ -44,26 +44,39 @@ beforeEach(() => {
     },
     alarms: { ...alarms, onAlarm: { addListener: () => {} } },
     runtime: { getManifest: () => manifest },
+    management: { getSelf: async () => ({ installType: 'development' }) },
     action: badge,
   };
   mocks.readReminder.mockResolvedValue(null);
 });
 
 describe('更新提醒的定时任务', () => {
+  it('商店安装即使无 update_url 也会撤销任务、提醒和角标', async () => {
+    settings['margin:settings'] = { updateInterval: 6, privacyExternal: true };
+    vi.spyOn(chrome.management, 'getSelf').mockResolvedValue({ installType: 'normal' } as chrome.management.ExtensionInfo);
+    existing = { name: 'margin:update-check', periodInMinutes: 360 } as chrome.alarms.Alarm;
+    mocks.readReminder.mockResolvedValue({ tag: '0.60.99', url: '', at: 1 });
+    await syncSchedule(); await runCheck();
+    expect(alarms.clear).toHaveBeenCalled();
+    expect(mocks.clearReminder).toHaveBeenCalled();
+    expect(badge.setBadgeText).toHaveBeenCalledWith({ text: '' });
+    expect(mocks.checkRelease).not.toHaveBeenCalled();
+  });
+
   it('默认关闭时不排任务', async () => {
     await syncSchedule();
     expect(alarms.create).not.toHaveBeenCalled();
   });
 
   it('按设置排任务，小时换算成分钟', async () => {
-    settings['margin:settings'] = { updateInterval: 6 };
+    settings['margin:settings'] = { updateInterval: 6, privacyExternal: true };
     await syncSchedule();
     expect(alarms.create).toHaveBeenCalledWith('margin:update-check', { periodInMinutes: 360 });
   });
 
   it('周期没变就不重复排', async () => {
     existing = { name: 'margin:update-check', periodInMinutes: 360 } as chrome.alarms.Alarm;
-    settings['margin:settings'] = { updateInterval: 6 };
+    settings['margin:settings'] = { updateInterval: 6, privacyExternal: true };
     await syncSchedule();
     expect(alarms.create).not.toHaveBeenCalled();
   });

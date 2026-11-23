@@ -12,7 +12,7 @@ import type { SponsorMessage } from '../shared/sponsor';
 import { clearSearchHistory, handleHistory, protectAuthStorage, trustedSender } from './privacy';
 import { SEARCH_HISTORY_KEY, type HistoryMessage } from '../shared/privacy';
 import { recordVersionInstall } from './updates';
-import { initReminder, runCheck, syncSchedule, UPDATE_ALARM } from './update-reminder';
+import { claimReminder, initReminder, runCheck, syncSchedule, UPDATE_ALARM } from './update-reminder';
 import { isReleaseUrl } from '../shared/update-reminder';
 import { handleWeatherLocation } from './weather-location';
 import type { WeatherLocationMessage } from '../shared/weather-location';
@@ -24,13 +24,13 @@ void authReady.catch(() => {});
 chrome.storage.onChanged.addListener((changes, area) => {
   const change = changes['margin:settings'];
   if (area !== 'local' || !change) return;
-  const previous = change.oldValue as { searchHistory?: boolean; updateInterval?: number } | undefined;
-  const next = change.newValue as { searchHistory?: boolean; updateInterval?: number } | undefined;
+  const previous = change.oldValue as { searchHistory?: boolean; updateInterval?: number; privacyExternal?: boolean; enabled?: boolean } | undefined;
+  const next = change.newValue as { searchHistory?: boolean; updateInterval?: number; privacyExternal?: boolean; enabled?: boolean } | undefined;
   if (next?.searchHistory !== true) {
     void serial(() => previous?.searchHistory === true ? clearSearchHistory() : chrome.storage.local.remove(SEARCH_HISTORY_KEY)).catch(() => {});
   }
   // 更新周期变了就重新排期；刚打开周期时顺便查一次，不用等第一个闹钟
-  if (previous?.updateInterval !== next?.updateInterval) {
+  if (previous?.updateInterval !== next?.updateInterval || previous?.privacyExternal !== next?.privacyExternal || previous?.enabled !== next?.enabled) {
     void serial(() => syncSchedule()).then(() => (next?.updateInterval ? runCheck() : undefined)).catch(() => {});
   }
 });
@@ -40,7 +40,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
   if (alarm.name !== UPDATE_ALARM) return;
   void serial(() => runCheck()).catch(() => {});
 });
-void initReminder().catch(() => {});
+void serial(initReminder).catch(() => {});
 
 async function handle(m: FpMessage): Promise<unknown> {
   return handleFootprint(m);
@@ -99,9 +99,10 @@ async function handleApp(m: AppMessage): Promise<unknown> {
 
 type OpenVideoTabMessage = { margin: 'open-video-tab'; bvid: string };
 
-chrome.runtime.onMessage.addListener((m: FpMessage | AppMessage | SponsorMessage | HistoryMessage | WeatherLocationMessage | OpenVideoTabMessage | { margin: 'open-release-check' } | { margin: 'open-release-page'; url?: unknown }, sender, reply) => {
-  if (!m || !['app', 'fp', 'sponsor', 'privacy', 'weather-location', 'open-video-tab', 'open-release-check', 'open-release-page'].includes(m.margin)) return;
+chrome.runtime.onMessage.addListener((m: FpMessage | AppMessage | SponsorMessage | HistoryMessage | WeatherLocationMessage | OpenVideoTabMessage | { margin: 'claim-update-reminder' } | { margin: 'open-release-check' } | { margin: 'open-release-page'; url?: unknown }, sender, reply) => {
+  if (!m || !['app', 'fp', 'sponsor', 'privacy', 'weather-location', 'claim-update-reminder', 'open-video-tab', 'open-release-check', 'open-release-page'].includes(m.margin)) return;
   if (!trustedSender(sender, chrome.runtime.id)) { reply({ ok: false, error: '消息来源无效' }); return; }
+  if (m.margin === 'claim-update-reminder') { serial(claimReminder).then(reply, () => reply(null)); return true; }
   if (m.margin === 'open-release-page') {
     // 只放行官方仓库的发布页
     if (!isReleaseUrl(m.url)) { reply({ ok: false }); return true; }

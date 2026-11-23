@@ -1,5 +1,4 @@
-import { newerRelease } from '../../shared/releases';
-import { readReminder, writeReminder } from '../../shared/update-reminder';
+import { readReminder, type UpdateReminder } from '../../shared/update-reminder';
 import { toast } from './controls';
 
 /**
@@ -20,12 +19,13 @@ export function mountUpdateReminder(app: HTMLElement): void {
     }
     showing = true;
     try {
-      const state = await readReminder();
-      if (!state || state.seen) return;
-      if (!newerRelease(state.tag, chrome.runtime.getManifest().version)) return;
+      const saved = await readReminder();
+      if (!saved || saved.seen) return;
+      const state: UpdateReminder | null = await chrome.runtime.sendMessage({ margin: 'claim-update-reminder' });
+      if (!state?.tag) return;
       toast(app, `映间有新版本 v${state.tag}`, { label: '查看发布页', run: () => { void chrome.runtime.sendMessage({ margin: 'open-release-page', url: state.url }); } });
       // 看过一次就不再重复弹；扩展图标上的角标会一直留着，直到装上新版
-      await writeReminder({ ...state, seen: true });
+
     } catch { /* 读不到状态就不提醒，不影响页面。 */ }
     finally { showing = false; }
   };
