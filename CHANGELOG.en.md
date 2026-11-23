@@ -6,6 +6,24 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.92](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.92) · 2026-11-22 · Update reminders
+
+Display version 0.6.92, browser update version 0.60.92.
+
+### Added
+
+- Settings → Privacy & data → Update reminders: pick how often to check (off / 1 hour / 6 hours / 12 hours / daily / 3 days / weekly), **off by default**. On each tick it looks for the latest stable release, marks the extension icon with 新 when a newer one exists, and reminds you once in the page.
+- The reminder links to the official release page. Installing stays the same: download the archive, overwrite the extension folder and reload the extension — the extension never touches that folder and downloads nothing.
+- The extension popup shows the current reminder interval.
+
+### Changed
+
+- Store installs are updated by the browser itself, so the reminder only concerns unpacked installs: the background does not query at all once it sees `update_url`.
+
+### Permissions
+
+Adds `alarms` for the scheduled check. The badge and the in-page reminder need no extra permission; no notification permission and no sensitive permissions are introduced.
+
 ## [v0.6.91](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.91) · 2026-11-22
 
 ### Added
