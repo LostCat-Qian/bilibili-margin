@@ -221,7 +221,8 @@ export class SpaceApp {
       menu.hidden = false;
       setTimeout(() => document.addEventListener('pointerdown', outside, true));
     };
-    menu.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); closeMenu(); followBtn.focus(); } });
+    let menuTrigger = followBtn;
+    menu.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); closeMenu(); menuTrigger.focus(); } });
     const item = (label: string, fn: () => void, danger = false) => h('button', { class: `sp-mi${danger ? ' danger' : ''}`, type: 'button', role: 'menuitem', onclick: fn }, label);
     const setFollowing = (on: boolean) => { invalidateFollowStatus(i.mid); followBtn.classList.toggle('on', on); followBtn.textContent = on ? '已关注' : '+ 关注'; };
     const groups = async () => {
@@ -247,6 +248,7 @@ export class SpaceApp {
     };
     followBtn.setAttribute('aria-haspopup', 'menu');
     followBtn.addEventListener('click', async () => {
+      menuTrigger = followBtn;
       const token = csrf();
       if (!token) { openBili('https://passport.bilibili.com/login'); return; }
       if (followBtn.classList.contains('on')) {
@@ -273,10 +275,16 @@ export class SpaceApp {
     const moreBtn = h('button', { class: 'sp-more', type: 'button', 'aria-label': '更多操作', 'aria-haspopup': 'menu', title: '更多' }, icon(ICONS.more));
     moreBtn.addEventListener('click', () => {
       if (!menu.hidden) { closeMenu(); return; }
-      const token = csrf();
-      if (!token) { openBili('https://passport.bilibili.com/login'); return; }
-      openMenu([item(`拉黑 ${i.name}`, async () => {
+      menuTrigger = moreBtn;
+      const report = item('前往原版空间举报', () => {
         closeMenu();
+        moreBtn.focus();
+        openBili(`https://space.bilibili.com/${i.mid}?margin=off`);
+      });
+      openMenu([report, item(`拉黑 ${i.name}`, async () => {
+        closeMenu();
+        const token = csrf();
+        if (!token) { openBili('https://passport.bilibili.com/login'); return; }
         if (!confirm(`确定把 ${i.name} 加入黑名单？拉黑后对方不能关注你、给你发私信和评论。`)) return;
         const ok = await block(i.mid, true, token).catch(() => false);
         toast(this.shell.app, ok ? '已加入黑名单，可在 B 站设置 → 黑名单管理里移出' : '操作失败，请稍后再试');

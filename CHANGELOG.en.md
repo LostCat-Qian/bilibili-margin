@@ -6,6 +6,17 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.103](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.103) · 2026-11-23 · Video credits, profile reporting and Watch Later
+
+### Fixed
+
+- Collaborator credits wrap to the available sidebar width. The standard player keeps its expand and collapse controls and shows everyone when those controls are absent. Widescreen shows the full team.
+- The More menu on another user's profile now opens that user's original Bilibili profile so you can report the account there.
+
+### Changed
+
+- The Watch Later title and count appear directly over the wallpaper. Filters and actions form separate groups that wrap on narrow windows.
+
 ## [v0.6.100](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.100) · 2026-11-23 · Watch Later undo and raised footprint tiles
 
 ### Added

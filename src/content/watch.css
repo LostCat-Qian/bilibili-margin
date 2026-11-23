@@ -160,6 +160,17 @@ html.margin-watch .up-panel-container {
   padding: 16px 16px; margin-bottom: 16px; height: auto !important;
 }
 html.margin-watch .up-info-container { margin: 0 !important; }
+/* 原站按窗口宽度决定是否提供展开按钮；空间不足时，按卡片实际宽度换行。 */
+html.margin-watch .membersinfo-normal > .header:not(:has(.fold-btn.unfold)) + .container {
+  flex-wrap: wrap !important;
+  max-height: none !important;
+}
+/* 宽屏原生滚动条每次平移四个成员；改为流式排列，以免窄侧栏跳过成员。 */
+html.margin-watch .membersinfo-wide .scroll-panel { width: 100%; }
+html.margin-watch .membersinfo-wide .scroll-inside {
+  width: 100%; flex-wrap: wrap; transform: none !important;
+}
+html.margin-watch .membersinfo-wide .container > :is(.van-icon-general_back_s, .van-icon-general_enter_s, .general-mask-left, .general-mask-right) { display: none !important; }
 html.margin-watch:not(.margin-wide):not(.margin-webscreen) :is(.right-container, .playlist-container--right) { padding-top: var(--m-author-pad, 0px) !important; }
 html.margin-watch .up-detail-top .up-name { font-weight: 600 !important; color: var(--m-ink) !important; }
 html.margin-watch .up-avatar-wrap .bili-avatar { box-shadow: 0 0 0 1px var(--m-line); border-radius: 50%; }
