@@ -6,6 +6,11 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+### Added
+
+- Click the checkmark on a video cover to undo adding it to Watch Later. If removal fails, the checkmark stays available for retry.
+- The footprint heatmap marks days with at least three hours of activity with raised glass tiles in the year, month, and compact week views.
+
 ## [v0.6.97](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.97) · 2026-11-23 · Space post actions and update reminders
 
 ### Added

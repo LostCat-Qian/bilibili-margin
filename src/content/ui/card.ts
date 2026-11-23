@@ -23,7 +23,7 @@ export function videoCard(v: Video, index: number, opts: CardOpts = {}): HTMLEle
     v.coop ? h('span', { class: 'coop', title: '多位 UP 主联合投稿' }, '合作') : null,
     // v0.51：充电专属等角标（右上角，避开左上角的「合作」）
     v.badge ? h('span', { class: 'tag-charge', title: v.badge }, v.badge) : null,
-    laterButton(v.bvid),
+    laterButton(v.bvid, v.aid),
   );
   const acts: HTMLElement[] = [];
   if (opts.onDislike && v.trackId) {

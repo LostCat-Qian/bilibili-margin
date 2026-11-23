@@ -25,6 +25,34 @@ try {
   const page = await ctx.newPage(); page.on('pageerror', e => errors.push(e.message));
   await page.goto('https://www.bilibili.com/');
   const card = page.locator('#margin-root .fp-card'), cell = key => card.locator(`.fp-cells [data-k="${key}"]`);
+  await check('raised glass follows actual seconds in week, year and month', async () => {
+    const saved = await worker.evaluate(async () => (await chrome.storage.local.get('margin:activity'))['margin:activity']);
+    const setSeconds = s => worker.evaluate(({saved, older, s}) =>
+      chrome.storage.local.set({'margin:activity':{...saved,[older]:{s,f:'08:00'}}}), {saved, older, s});
+    const dot = card.locator(`.fp-week [data-k="${older}"]`);
+    await setSeconds(10799); await dot.waitFor();
+    assert.equal(await dot.evaluate(el => el.classList.contains('fp-glass-day')), false);
+    await setSeconds(10800);
+    await card.locator(`.fp-week .fp-glass-day[data-k="${older}"]`).waitFor();
+    await card.getByRole('button',{name:'展开全年'}).click();
+    await cell(older).waitFor();
+    assert.notEqual(await cell(older).evaluate(el => getComputedStyle(el,'::before').boxShadow), 'none');
+    await cell(today).focus(); await page.keyboard.press('ArrowUp');
+    assert.equal(await cell(day(-1)).evaluate(el => el.matches(':focus')), true);
+    await card.getByRole('button',{name:'月',exact:true}).click();
+    if (older.slice(0,7) !== today.slice(0,7)) await card.getByRole('button',{name:'上个月'}).click();
+    const month = card.locator(`.fp-day-b[data-k="${older}"]`);
+    await month.waitFor(); await month.click();
+    assert.equal(await month.getAttribute('aria-pressed'),'true');
+    assert.equal(await month.evaluate(el => getComputedStyle(el,'::before').getPropertyValue('--fp-depth').trim()), '3px');
+    await setSeconds(10801); await page.emulateMedia({reducedMotion:'reduce'}); await month.hover();
+    assert.equal(await month.evaluate(el => getComputedStyle(el,'::before').animationName),'none');
+    await setSeconds(10799);
+    await card.locator(`.fp-day-b:not(.fp-glass-day)[data-k="${older}"][title*="2 小时 59 分"]`).waitFor();
+    await worker.evaluate(data => chrome.storage.local.set({'margin:activity':data}),saved);
+    await card.getByRole('button',{name:'收起足迹'}).click();
+    await page.emulateMedia({reducedMotion:'no-preference'});
+  });
   await check('sparse histories show a real seven-day strip and remember keyboard expansion', async () => {
     const expand = card.getByRole('button', { name: '展开全年' });
     await expand.waitFor({timeout:4000});
