@@ -6,6 +6,8 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.100](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.100) · 2026-11-23 · Watch Later undo and raised footprint tiles
+
 ### Added
 
 - Click the checkmark on a video cover to undo adding it to Watch Later. If removal fails, the checkmark stays available for retry.
