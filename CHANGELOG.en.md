@@ -6,8 +6,12 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+## [v0.6.97](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.97) · 2026-11-23 · Space post actions and update reminders
+
 ### Added
 
+- Since the previous public release (0.6.88), unpacked installs can enable scheduled update reminders under Privacy & Data. Reminders default to off and use the new alarms permission. Turning them off clears the schedule, reminder and badge.
+- Optional per-context autoplay and emoji, mentions and image paste in dynamic comments are included. Web fullscreen realigns the progress bar when the title changes height.
 - Open the native editor or confirm deletion from your own space feed when the post allows the action (#240).
 
 ### Changed
