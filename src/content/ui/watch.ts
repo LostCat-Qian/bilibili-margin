@@ -4,6 +4,7 @@ import { loadSettings } from '../../shared/settings';
 import { h, ICONS, guardTyping } from './dom';
 import { toast } from './controls';
 import { addWatchLater } from '../api/search';
+import { resumeWatchLater } from '../api/watchlater-resume';
 import { createFavorites } from './favorites';
 import { createHeader, type Header, SITE_LINKS } from './header';
 import { attachPreview } from './preview';
@@ -58,6 +59,7 @@ export class WatchSkin {
   constructor(private settings: Settings, private kind: SkinKind = 'watch') {
     const de = document.documentElement;
     const isWatch = kind === 'watch';
+    if (isWatch && /^\/list\/watchlater\/?$/.test(location.pathname)) void resumeWatchLater();
     if (isWatch) this.bg.cap(30);
     // 全局换皮样式（watch.css + pages.css）由入口脚本在 document_start 挂上（见 main.ts skinStyle），这里只补类名
     de.classList.add('margin-skin', `margin-${kind}`);

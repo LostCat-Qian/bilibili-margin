@@ -8,6 +8,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ### Added
 
+- Reopening a multipart video or series from Watch Later can resume a verified episode from the 30 most recent Bilibili video history entries. Explicit links and manual selections take priority.
 - Choose which feed opens on the homepage. The new Posts filter in the activity feed includes text, image posts and articles.
 
 ### Fixed

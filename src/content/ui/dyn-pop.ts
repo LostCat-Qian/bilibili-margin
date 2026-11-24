@@ -544,7 +544,7 @@ export const POPS: Record<string, (o: { onDyn?: () => void; msgRemind?: () => bo
     ...previewPages(async () => {
       const l = await watchLater();
       return l && { more: false, rows: l.map((x) => ({
-        href: `https://www.bilibili.com/list/watchlater?bvid=${x.bvid}`, title: x.title, who: x.author, sub: dur(x.duration), cover: x.cover,
+        href: `https://www.bilibili.com/list/watchlater?bvid=${x.bvid}&margin_resume=1`, title: x.title, who: x.author, sub: dur(x.duration), cover: x.cover,
         progress: x.duration > 0 ? (x.progress < 0 ? 1 : x.progress / x.duration) : undefined,
         remove: () => removeWatchLater(x.aid),
       })) };
