@@ -44,7 +44,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   const version = chrome.runtime.getManifest().version_name || chrome.runtime.getManifest().version;
   const enabledT = toggle(s0.enabled, '启用 MARGIN', (value) => save({ enabled: value }));
   const pages = pillToggles(REDESIGN_PAGES.map(p => [p, REDESIGN_LABELS[p]]), REDESIGN_PAGES.filter(p => !s0.pageOff.includes(p)), on => save({ pageOff: REDESIGN_PAGES.filter(p => !on.includes(p)) }));
-  const externalT = toggle(s0.privacyExternal, '允许外部辅助服务', (value) => save({ privacyExternal: value }));
+  const externalT = toggle(s0.privacyExternal, '允许外部辅助服务', (value) => { save({ privacyExternal: value }); paintDeps(); });
   const historyT = toggle(s0.searchHistory, '保存最近搜索', (value) => save({ searchHistory: value }));
   const clearHistory = h('button', { type: 'button', class: 'ghost small', onclick: async () => {
     clearHistory.setAttribute('disabled', '');
@@ -64,8 +64,8 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   const watch = toggle(s0.watch, '其他页面重设计', (v) => { save({ watch: v }); paintDeps(); });
   const preview = toggle(s0.hoverPreview, '悬停预览', (v) => save({ hoverPreview: v }));
   const intro = toggle(s0.intro, '开场动画', (v) => save({ intro: v }));
-  const reduceM = toggle(s0.reduceMotion, '减少动画', (v) => save({ reduceMotion: v }));
-  const effects = toggle(s0.uiEffects, '控件动效', (v) => save({ uiEffects: v }));
+  const reduceM = toggle(s0.reduceMotion, '减少动画', (v) => { save({ reduceMotion: v }); paintDeps(); });
+  const effects = toggle(s0.uiEffects, '控件动效', (v) => { save({ uiEffects: v }); paintDeps(); });
   const palSpeedIn = h('input', {
     type: 'number', class: 'city-in palette-speed-in', min: '50', max: '200', step: '10',
     value: String(s0.paletteSpeed), 'aria-label': '搜索框展开速度（%）', inputmode: 'numeric',
@@ -584,12 +584,11 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   const playbackNote = h('p', { class: 'stg-warn', hidden: watch.getAttribute('aria-checked') === 'true' },
     '当前已关闭「其他页面重设计」，本组设置不会生效。',
     h('button', { type: 'button', class: 'ghost small', onclick: () => watch.click() }, '立即开启'));
-  const paintDeps = () => {
-    const style = searchStyle.querySelector<HTMLElement>('[aria-checked="true"]')?.dataset.v ?? 'classic';
-    palSpeedRow.toggleAttribute('data-off', style !== 'new');
-    palSpeedIn.disabled = style !== 'new';
-    playbackNote.hidden = watch.getAttribute('aria-checked') === 'true';
-  };
+  /** 子项随母项变灰（#239）：[子控件, 母项条件…]。母项不满足时子项所在行 data-off，行内控件 disabled；
+   *  只解禁自己禁掉的（记 data-dep-off），不碰检查更新进行中、授权等本来就可能 disabled 的控件。
+   *  条件读开关的 aria-checked 而不是 get()：storage 回写是异步的，点完要立刻看到。依赖表在 sections 之后（见 paintDeps）。 */
+  const on = (t: HTMLElement) => () => t.getAttribute('aria-checked') === 'true';
+  const off = (t: HTMLElement) => () => t.getAttribute('aria-checked') !== 'true';
   const resetAll = () => {
     if (!confirm('恢复默认设置？主题、背景、过滤等都会回到初始值；足迹、搜索记录和自定义背景图片不受影响。')) return;
     const next = { ...DEFAULTS, filters: { ...DEFAULTS.filters }, bg: { ...DEFAULTS.bg } };
@@ -651,7 +650,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
     row('界面质感', '柔和磨砂、液态折射或简洁平面', glass),
     row('封面悬停预览', '鼠标停留半秒后静音播放', preview),
     row('控件动效', '按钮、面板、三连和卡片过渡；背景与天气独立设置', effects),
-    row('减少动画', '暂停背景、天气和悬停动画，固定账号工牌；系统减少动态效果始终生效', reduceM),
+    row('减少动画', '暂停背景、天气、悬停和开场动画，固定账号工牌；系统减少动态效果始终生效', reduceM),
     row('开场动画', '每次打开浏览器后第一次进首页播放，点一下可跳过', intro),
     sub('字体'),
     block('标题字体', '页面标题和大号文字用衬线（宋体）还是无衬线（黑体）', fontS),
@@ -749,6 +748,32 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
       row('记住授权', '默认关闭。开启后在本机保留最多 30 天，以 B 站有效期为上限；关闭后仅保留当前会话。', rememberT),
       h('div', { class: 'af-row' }, appStat, h('div', { class: 'data-acts' }, appBtn, appOff)), appQrBox, appQrNote),
     row('X 式重排', '按你的观看历史重新排：常看完的 UP 往前，秒退和「不感兴趣」的往后，混入关注的人 48 小时内的新稿，看过的不再出现。只在本机计算，可和 App 推荐流一起用', rankT));
+
+  const deps: [HTMLElement, ...(() => boolean)[]][] = [
+    [wxT, on(externalT)],              // 天气定位与查询走外部服务（api/weather）
+    [sponsorT, on(externalT)],         // 小电视空降助手（background/sponsor）
+    [updateInterval, on(externalT)],   // 更新提醒查 GitHub（background/update-reminder）
+    // 「检查更新」按钮保持可点：外部服务关闭时点击会提示去隐私分类开启（reported-20261118 回归）
+    [intro, off(reduceM)],             // shouldPlayIntro：减少动画时不放开场
+    [idD, on(effects), off(reduceM)],  // 账号卡片：控件动效关或减少动画时固定（user-menu）
+  ];
+  const paintDeps = () => {
+    const style = searchStyle.querySelector<HTMLElement>('[aria-checked="true"]')?.dataset.v ?? 'classic';
+    palSpeedRow.toggleAttribute('data-off', style !== 'new');
+    palSpeedIn.disabled = style !== 'new';
+    playbackNote.hidden = watch.getAttribute('aria-checked') === 'true';
+    for (const [control, ...conds] of deps) {
+      const host = control.closest<HTMLElement>('.row, .block');
+      if (!host) continue;
+      const live = conds.every((c) => c());
+      host.toggleAttribute('data-off', !live);
+      for (const el of host.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('button, input, select, textarea')) {
+        if (!live) { if (!el.disabled) { el.disabled = true; el.dataset.depOff = ''; } }
+        else if ('depOff' in el.dataset) { el.disabled = false; delete el.dataset.depOff; }
+      }
+    }
+  };
+  paintDeps();  // 首次打开不走 sync()，依赖状态要在这里先画一遍
 
   return {
     sheet,

@@ -17,6 +17,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ### Changed
 
+- Settings that depend on another switch are greyed out and cannot be changed while that switch is off: weather, community advertisement skipping and update reminders while external services are disabled; the opening animation and the draggable account card while reduced motion is on; the draggable account card while UI effects are off. The state is applied as soon as settings open.
 - Animated wallpaper on video pages renders at up to 30 fps, or 24 fps in listening mode.
 
 ## [v0.6.103](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.103) · 2026-11-23 · Video credits, profile reporting and Watch Later
