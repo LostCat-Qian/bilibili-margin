@@ -14,6 +14,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 - Homepage cards group negative feedback actions in the More menu and preserve the scroll position when filtering.
 - Mesh and Aurora backgrounds prefer high precision and bound noise inputs on devices limited to medium precision.
+- Switching creators from the left follow list on the activity feed now returns to the top and highlights the selection in the top avatar strip, matching the sidebar layout; previously the page kept its scroll position.
 
 ### Changed
 

@@ -90,7 +90,9 @@ jobs:
         env:
           SMOKE_OUT: smoke-artifacts/pr-completion
       - name: Homepage and activity feed preferences
-        run: node tests/feed-preferences.mjs
+        run: |
+          node tests/feed-preferences.mjs
+          node tests/feed-follow-select.mjs
       - name: Recommendation batch navigation
         run: node tests/feed-batches.mjs
         env:
