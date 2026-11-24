@@ -144,7 +144,7 @@ export class FeedApp {
       type: 'button', class: 'fd-up',
       style: 'display:flex;align-items:center;gap:8px;background:none;border:0;color:inherit;cursor:pointer;padding:5px 6px;border-radius:8px;text-align:left;font:inherit;width:100%',
       title: u.name,
-      onclick: () => { this.host = this.host === u.mid ? 0 : u.mid; void this.reload(); },
+      onclick: () => this.selectUp(u.mid, true),
       onmouseenter: (e: Event) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,.06)'; },
       onmouseleave: (e: Event) => { (e.currentTarget as HTMLElement).style.background = ''; },
     }, h('span', { style: 'width:26px;height:26px;border-radius:50%;overflow:hidden;flex:none;display:block' }, face(u.face, '', 64)),
@@ -208,6 +208,15 @@ export class FeedApp {
       list, more));
   }
 
+  /** 切换只看某个 UP（0 = 全部），同步头像条选中态。固定可见的入口（侧栏布局的头像条、左侧关注列表）点完回到顶部；
+   *  经典布局的头像条跟着内容滚，能点到它说明已经在顶部，不用滚。 */
+  private selectUp(mid: number, fromFixed: boolean): void {
+    this.host = this.host === mid ? 0 : mid;
+    if (fromFixed) this.shell.app.scrollTo({ top: 0, behavior: reducedMotion() ? 'instant' : 'smooth' });
+    this.strip.querySelectorAll<HTMLElement>('.fd-up').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.mid) === this.host)));
+    void this.reload();
+  }
+
   private renderUps(ups: Up[]): void {
     if (!ups.length) return;
     const mk = (mid: number, name: string, img: Node, fresh = false) => {
@@ -215,15 +224,12 @@ export class FeedApp {
       b.dataset.mid = String(mid);
       if (fresh) b.classList.add('fresh');
       b.addEventListener('click', () => {
-        this.host = this.host === mid ? 0 : mid;
-        if (this.shell.settings.feedLayout === 'sidebar') this.shell.app.scrollTo({ top: 0, behavior: reducedMotion() ? 'instant' : 'smooth' });
+        this.selectUp(mid, this.shell.settings.feedLayout === 'sidebar');
         b.classList.remove('fresh');
-        this.strip.querySelectorAll<HTMLElement>('.fd-up').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.mid) === this.host)));
         if (b.parentElement === row) {
           const item = b.getBoundingClientRect(), bounds = row.getBoundingClientRect();
           row.scrollBy({ left: item.left - bounds.left - (bounds.width - item.width) / 2, behavior: reducedMotion() ? 'instant' : 'smooth' });
         }
-        this.reload();
       });
       return b;
     };
