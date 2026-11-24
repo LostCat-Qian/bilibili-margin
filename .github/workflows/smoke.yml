@@ -279,6 +279,7 @@ jobs:
         run: |
           node tests/settings-page.mjs
           node tests/navigation-layout.mjs
+          node tests/settings-dependencies.mjs
         env:
           SMOKE_OUT: smoke-artifacts/settings-page
       - if: always()
