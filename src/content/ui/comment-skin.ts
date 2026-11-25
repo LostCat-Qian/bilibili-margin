@@ -15,6 +15,9 @@ const TAG_SKIN = `
 `;
 
 const SKINS: Record<string, string> = {
+  'bili-comments-vote-card': `
+    #duel { --option-color: var(--margin-duel-ink, var(--Pi10_u)); }
+  `,
   'bili-comments-popup': `
     :host([data-margin-comment-detail]):host-context(html.margin-skin) #wrap,
     :host([data-margin-comment-detail]):host-context(html.margin-skin) #content { background: var(--m-surface) !important; color: var(--m-ink) !important; }

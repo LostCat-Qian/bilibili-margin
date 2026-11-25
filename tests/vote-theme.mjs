@@ -84,6 +84,30 @@ try {
     assert.equal((await inspect()).root.bg,'rgb(255, 255, 255)');
     results.push({host,automaticThemeSwitch:true,nativeVoteClicks:await page.evaluate(()=>window.voteClicks)});
   }
+  await page.goto('https://www.bilibili.com/video/BV1XisL6cELg/');
+  await page.locator('#margin-watch-top').waitFor({state:'attached'});
+  await page.evaluate(() => {
+    const comments = document.createElement('bili-comments');
+    const header = document.createElement('bili-comments-header-renderer');
+    const card = document.createElement('bili-comments-vote-card');
+    comments.attachShadow({mode:'open'}).append(header);
+    header.attachShadow({mode:'open'}).append(card);
+    card.attachShadow({mode:'open'}).innerHTML = '<style>:host{--Pi10_u:#3f0723;--option-color:var(--Pi10_u)}.option{color:var(--option-color)}</style><div id="duel"><div class="option left">非常满意</div><div class="option right">期待后续</div></div>';
+    document.body.append(comments);
+  });
+  const duel = page.locator('bili-comments-vote-card #duel');
+  const color = () => duel.locator('.left').evaluate(el => getComputedStyle(el).color);
+  await page.emulateMedia({colorScheme:'dark'});
+  await duel.locator('.left').evaluate(el => new Promise((resolve,reject) => {
+    const deadline = performance.now() + 6000;
+    const check = () => getComputedStyle(el).color === 'rgb(237, 237, 238)' ? resolve() : performance.now() > deadline ? reject(new Error('dark vote label')) : requestAnimationFrame(check);
+    check();
+  }));
+  await duel.locator('.right').evaluate(el => el.style.setProperty('--option-color', 'white'));
+  assert.equal(await duel.locator('.right').evaluate(el=>getComputedStyle(el).color),'rgb(255, 255, 255)');
+  await page.emulateMedia({colorScheme:'light'});
+  await page.locator('html[data-margin-theme="light"]').waitFor({state:'attached'});
+  assert.equal(await color(),'rgb(63, 7, 35)');
   assert.deepEqual(errors,[]);
   console.log('PASS vote themes on both hosts, live switching, late CSS, native clicks and progress values');
 } finally {

@@ -50,6 +50,18 @@ try {
       }));
       await page.goto('https://www.bilibili.com/video/BV1mdxN68E7F/');
       await page.locator('html.margin-triple').waitFor({ state: 'attached' });
+      if (mode === 'click') {
+        await page.evaluate(() => {
+          const wrap = document.createElement('div');
+          wrap.className = 'toolbar-left-item-wrap';
+          wrap.innerHTML = '<span role="button" id="bili-mux-toggle">下載</span><div class="ring-progress"></div>';
+          wrap.firstElementChild.onclick = () => wrap.dataset.open = 'true';
+          document.querySelector('.video-toolbar-left-main').append(wrap);
+        });
+        await page.locator('#bili-mux-toggle').click();
+        assert.equal(await page.locator('.toolbar-left-item-wrap:has(#bili-mux-toggle)').getAttribute('data-open'), 'true');
+        assert.equal(await page.locator('.toolbar-left-item-wrap .ring-progress').isVisible(), false);
+      }
       const button = page.locator('.video-like');
       const box = await button.boundingBox();
       const point = { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) };
