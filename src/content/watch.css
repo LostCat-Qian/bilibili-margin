@@ -58,10 +58,11 @@ html.margin-skin[data-margin-theme="dark"] {
 }
 html.margin-skin body { background: var(--m-canvas) !important; color: var(--m-ink); }
 
-/* 顶栏：原生顶栏隐藏，换成 MARGIN 顶栏（#margin-watch-top，Shadow DOM） */
+/* 顶栏：原生顶栏隐藏，换成 MARGIN 顶栏（#margin-watch-top，Shadow DOM）。
+   顶栏本身透明，只有搜索框和快捷入口是玻璃；整条放行点击（见 06-watch.css 的 .app.wt），两侧空白不遮下面滚过的内容 */
 html.margin-skin #biliMainHeader,
 html.margin-skin .bili-header.fixed-header { display: none !important; }
-#margin-watch-top { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; height: 72px; }
+#margin-watch-top { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; height: 72px; pointer-events: none; }
 /* 原生评论图片详情的 bili-popup 默认层级低于顶栏。 */
 html.margin-skin bili-popup { z-index: 10001 !important; }
 #margin-watch-top[hidden] { display: none !important; }

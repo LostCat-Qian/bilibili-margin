@@ -1,5 +1,9 @@
-/* 播放页顶栏：同一套 .app 变量，只占顶部 72px，抽屉仍覆盖全屏 */
-.app.wt { position: fixed; inset: 0 0 auto 0; height: 72px; overflow: visible; background: transparent; scrollbar-gutter: auto; }
+/* 播放页顶栏：同一套 .app 变量，只占顶部 72px，抽屉仍覆盖全屏。
+   顶栏整条透明，但它横贯全宽、层级最高：带子本身（宿主、.app.wt、.top）放行点击，
+   否则两侧空白会遮住滚过下面的标题和评论（#258）；只有顶栏的直接控件和抽屉、悬浮菜单等其他子元素接收事件 */
+.app.wt { position: fixed; inset: 0 0 auto 0; height: 72px; overflow: visible; background: transparent; scrollbar-gutter: auto; pointer-events: none; }
+/* 用 :where() 把特异性降到零：子元素自己声明的 pointer-events（如工具提示 .tt 的 none）始终优先 */
+:where(.app.wt > :not(.top), .app.wt .top > *) { pointer-events: auto; }
 .app.wt .top { position: relative; }
 .app.wt .top:has(.et-labels) { display: flex; padding-inline: clamp(16px, 3vw, 64px); }
 .app.wt .top:has(.et-labels) .search { flex: 1 1 120px; max-width: 520px; }

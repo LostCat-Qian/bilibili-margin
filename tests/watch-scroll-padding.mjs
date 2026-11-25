@@ -38,8 +38,9 @@ try {
   const top = await page.evaluate(() => document.querySelector('#commentapp').getBoundingClientRect().top);
   assert(top >= bar, `comments must land below the header: top=${top}`);
   assert.equal(Math.round(top), 96);
-  const hit = await page.evaluate(() => document.elementsFromPoint(innerWidth / 2, 8).map((e) => e.id || e.tagName).slice(0, 2));
-  assert(hit.includes('margin-watch-top'), 'the header still sits on top at the viewport edge');
+  // 顶栏本身放行点击（见 watch-header-pointer-events），这里只确认它仍固定在视口顶端
+  const barBox = await page.evaluate(() => { const r = document.getElementById('margin-watch-top').getBoundingClientRect(); return { top: r.top, height: r.height, position: getComputedStyle(document.getElementById('margin-watch-top')).position }; });
+  assert.deepEqual(barBox, { top: 0, height: 72, position: 'fixed' }, 'the header still spans the viewport top');
   results.push('scroll targets land 96px down, right below the 72px header');
   await page.screenshot({ path: join(out, 'jump.png') });
 
