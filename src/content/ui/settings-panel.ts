@@ -732,7 +732,7 @@ function buildSettingsPanel(sheet: SettingsPage, get: () => Settings, currentSha
   sheet.section('privacy', '隐私与数据', '外部服务、搜索记录和备份。',
     row('允许外部辅助服务', '默认关闭；开启后允许天气定位、天气查询、社区广告片段和 GitHub 更新查询。服务会接收请求 IP。', externalT),
     block('更新提醒', '默认关闭。开启后按周期自动查一次最新正式版，发现新版时在扩展图标上标「新」并在页面上提醒一次。安装仍然走官方发布页手动下载，扩展不碰扩展文件夹；商店安装的版本由浏览器自己更新，这里只针对解压安装。', updateInterval),
-    row('保存最近搜索', '默认关闭。开启后保存在扩展内，最多 8 条、保留 30 天；仍在网页里的旧版记录会在开启后移入。', historyT),
+    row('保存最近搜索', '默认关闭。开启后在扩展内保留搜索历史，最多 8 条、30 天过期；仍在网页里的旧版记录会在开启后移入。', historyT),
     row('搜索记录', null, clearHistory),
     h('p', { class: 'stg-note' }, 'App 授权默认仅保留在当前会话；可在实验功能中开启「记住授权」，最多保存 30 天。'),
     h('div', { class: 'row' },

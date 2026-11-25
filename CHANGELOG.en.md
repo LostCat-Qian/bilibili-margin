@@ -12,6 +12,8 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ### Fixed
 
+- Keep the icon and label of Bili-Mux 1.2.6's embedded download button visible with triple-action effects. Searching settings for “搜索历史” now finds the existing local search history switch.
+
 - Keep the search scroll ruler in sync as results grow so clicks and drags reach the indicated position.
 - The empty space on either side of the video and search page header no longer intercepts clicks. The bar itself is transparent, so only the search box, quick entries and other controls receive clicks, and titles or comments scrolled underneath can be clicked directly.
 - Improve text contrast on unvoted head-to-head polls in dark video comments while preserving the native result colors.

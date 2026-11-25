@@ -37,6 +37,8 @@ try {
   results.push('eight categories, single panel and keyboard navigation');
   await tabs.nth(1).click();
   const search = dialog.getByRole('searchbox', { name: '搜索设置' });
+  await search.fill('搜索历史');
+  await dialog.getByRole('switch', { name: '保存最近搜索', exact: true }).waitFor();
   await search.fill('播放器圆角');
   const corners = dialog.getByRole('switch', { name: '播放器圆角', exact: true });
   await corners.waitFor(); assert.equal(await tabs.nth(4).getAttribute('aria-selected'), 'true');

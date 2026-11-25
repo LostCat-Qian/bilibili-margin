@@ -275,7 +275,7 @@ html.margin-watch.margin-wide .right-container-inner.scroll-sticky { position: r
 html.margin-watch.margin-wide :is(.right-container, .playlist-container--right) #danmukuBox { margin-top: 0 !important; }
 
 /* 映间三连：藏掉原版长按动效（工具栏项里的附加层），用描边进度 + 弹起碎光代替 */
-html.margin-triple .toolbar-left-item-wrap > :not(.video-toolbar-left-item, .van-popover, .van-popper, button, a[href], [role="button"]) { display: none !important; }
+html.margin-triple .toolbar-left-item-wrap:not(button, a[href], [role="button"]) > :not(.video-toolbar-left-item, .van-popover, .van-popper, button, a[href], [role="button"]) { display: none !important; }
 /* 普通点赞 SVGA 挂载时先测量位置再移到 body，必须保留其测量盒子和装扮图标。 */
 html.margin-triple .video-like > :not(svg):not(.video-toolbar-item-icon):not(.video-toolbar-item-text):not(.svga-container),
 html.margin-triple .video-coin > :not(svg):not(.video-toolbar-item-icon):not(.video-toolbar-item-text),

@@ -57,7 +57,15 @@ try {
           wrap.innerHTML = '<span role="button" id="bili-mux-toggle">下載</span><div class="ring-progress"></div>';
           wrap.firstElementChild.onclick = () => wrap.dataset.open = 'true';
           document.querySelector('.video-toolbar-left-main').append(wrap);
+          const embedded = document.createElement('span');
+          embedded.className = 'toolbar-left-item-wrap';
+          embedded.setAttribute('role', 'button');
+          embedded.innerHTML = '<svg class="video-toolbar-item-icon" width="24" height="24"></svg><span class="video-toolbar-item-text">下載</span>';
+          wrap.after(embedded);
         });
+        const embedded = page.locator('.toolbar-left-item-wrap[role="button"]');
+        assert.ok(await embedded.locator('svg').isVisible());
+        assert.ok(await embedded.getByText('下載').isVisible());
         await page.locator('#bili-mux-toggle').click();
         assert.equal(await page.locator('.toolbar-left-item-wrap:has(#bili-mux-toggle)').getAttribute('data-open'), 'true');
         assert.equal(await page.locator('.toolbar-left-item-wrap .ring-progress').isVisible(), false);
