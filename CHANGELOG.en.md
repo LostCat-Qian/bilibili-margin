@@ -4,6 +4,12 @@
 
 New entries are grouped under Added, Changed, and Fixed, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version headings link to their GitHub releases. The display version and the browser update version are recorded separately so the latter can keep increasing for automatic updates.
 
+## Unreleased
+
+### Fixed
+
+- Jumping to the comments on a video page (the Comments command or the `#comment` anchor) now lands below the fixed 72px header; previously the comments heading and input box ended up underneath it.
+
 ## [v0.6.109](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.109) · 2026-11-24 · Watch Later resume, feed navigation and settings
 
 ### Added

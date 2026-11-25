@@ -4,6 +4,12 @@
 
 新条目按「新增」「改进」「修复」归类，参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。版本标题链接到对应的 GitHub Release。扩展的显示版本和包内更新版本分别记录，包内版本持续递增。
 
+## 未发布
+
+### 修复
+
+- 播放页用「看评论」或 `#comment` 锚点跳到评论区时，落点让出顶部 72px 的固定顶栏；此前评论标题和输入框会压在顶栏底下。
+
 ## [v0.6.109](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.109) · 2026-11-24 · 稍后再看续播、动态切换与设置联动
 
 ### 新增
