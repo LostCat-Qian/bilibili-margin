@@ -121,6 +121,8 @@ jobs:
           SMOKE_OUT=smoke-artifacts/home-width node tests/home-width.mjs
           SMOKE_OUT=smoke-artifacts/account-motion node tests/account-motion.mjs
           SMOKE_OUT=smoke-artifacts/vote-theme node tests/vote-theme.mjs
+          SMOKE_OUT=smoke-artifacts/continuous-corners node tests/continuous-corners.mjs
+          SMOKE_OUT=smoke-artifacts/watchlater-surface node tests/watchlater-surface.mjs
       - name: Native controls follow the selected accent
         run: node tests/accent-controls.mjs
         env:

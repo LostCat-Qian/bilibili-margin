@@ -22,9 +22,10 @@ try{
   await worker.evaluate(()=>chrome.storage.local.set({'margin:settings':{intro:false,theme:'dark',bg:{mode:'off'}}}));
   const page=await context.newPage();
   await page.goto('https://www.bilibili.com/',{waitUntil:'domcontentloaded'});
-  await page.locator('#margin-root .grid .card').first().waitFor();
+  const cover = page.locator('#margin-root .grid .card a.cover[href]').first();
+  await cover.waitFor();
   check('test browser supports native corner-shape',await page.evaluate(()=>CSS.supports('corner-shape','squircle')));
-  check('video covers use continuous corners',squircle(await shape(page.locator('#margin-root .cover').first())));
+  check('video covers use continuous corners',squircle(await shape(cover)));
   check('footprint panel uses continuous corners',squircle(await shape(page.locator('#margin-root .fp-card'))));
   check('collapsed hero search stays a capsule',round(await shape(page.locator('#margin-root .hero-search'))));
   check('theme track stays round',round(await shape(page.locator('#margin-root .ts'))));
@@ -40,7 +41,7 @@ try{
       await chrome.storage.local.set({'margin:settings':{...s,radius}});
     },radius);
     await page.waitForTimeout(80);
-    const value=await page.locator('#margin-root .cover').first().evaluate(el=>parseFloat(getComputedStyle(el).borderTopLeftRadius));
+    const value=await cover.evaluate(el=>parseFloat(getComputedStyle(el).borderTopLeftRadius));
     check(`radius control ${radius} retains expected dimensions`,Math.abs(value-12*radius/100)<.01);
   }
   await worker.evaluate(()=>chrome.storage.local.set({'margin:settings':{intro:false,theme:'dark',bg:{mode:'off'},radius:100}}));
