@@ -4,20 +4,22 @@
 
 New entries are grouped under Added, Changed, and Fixed, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version headings link to their GitHub releases. The display version and the browser update version are recorded separately so the latter can keep increasing for automatic updates.
 
-## Unreleased
+## [v0.7](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.70.0) · 2026-11-25 · Search navigation and player compatibility
 
 ### Added
 
 - Search results show a back-to-top button in the lower right after scrolling one screen.
 
-### Fixed
+### Changed
 
-- Keep the icon and label of Bili-Mux 1.2.6's embedded download button visible with triple-action effects. Searching settings for “搜索历史” now finds the existing local search history switch.
+- Searching settings for “搜索历史” now finds the existing local search history switch.
+
+### Fixed
 
 - Keep the search scroll ruler in sync as results grow so clicks and drags reach the indicated position.
 - The empty space on either side of the video and search page header no longer intercepts clicks. The bar itself is transparent, so only the search box, quick entries and other controls receive clicks, and titles or comments scrolled underneath can be clicked directly.
 - Improve text contrast on unvoted head-to-head polls in dark video comments while preserving the native result colors.
-- Keep interactive controls visible alongside the triple-action animation, including Bili-Mux when it mounts its download button inside a toolbar item.
+- Keep the Bili-Mux download button visible with triple-action effects, including its icon and label in version 1.2.6.
 - Pictures in dynamic-post comments now open in the in-page viewer and close on the backdrop or with Esc, matching the post's own pictures; previously they opened the raw image in a new tab.
 - Jumping to the comments on a video page (the Comments command or the `#comment` anchor) now lands below the fixed 72px header; previously the comments heading and input box ended up underneath it.
 
