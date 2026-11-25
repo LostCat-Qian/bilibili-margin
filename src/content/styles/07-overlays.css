@@ -254,9 +254,9 @@
 
 
 /* ── 当前窗口播放模态框（Liquid-glass 设计风格） ── */
-.vm-layer { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
-.vm-layer[hidden] { display: none; }
-.vm-layer[data-state="open"] { pointer-events: auto; }
+.vm-layer, .app.wt > .vm-layer { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
+.vm-layer[hidden], .app.wt > .vm-layer[hidden], .vm-layer[data-state="closed"] .vm-panel { display: none; pointer-events: none; }
+.vm-layer[data-state="open"], .app.wt > .vm-layer[data-state="open"] { pointer-events: auto; }
 .vm-scrim {
   position: absolute; inset: 0;
   background: color-mix(in srgb, var(--canvas) 30%, rgb(10 12 16 / .48));

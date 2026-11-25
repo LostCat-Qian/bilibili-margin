@@ -187,6 +187,61 @@ try {
   assert.equal(await watchLayer.locator('iframe.vm-frame').count(), 0);
   results.push({ name: 'watch-page-pauses-host-and-cleans-iframe', ok: true });
   console.log('PASS watch-page-pauses-host-and-cleans-iframe');
+
+  // 8. Search page: native video card & exact-first card have hover play button and open modal without navigating away
+  const searchFixture = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>
+    .search-page-video{max-width:1240px;margin:24px auto;padding:0 32px}
+    .video-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+    .bili-video-card__image{position:relative;aspect-ratio:16/9;background:#222}
+    .bili-video-card__image img{width:100%;height:100%;object-fit:cover;display:block}
+  </style></head><body><div id="app"><div class="search-content"><div class="search-page-video"><div class="video-list">
+    <div class="video-list-item"><div class="bili-video-card" data-k="s1"><a href="https://www.bilibili.com/video/BV1mdxN68E7F/"><div class="bili-video-card__image"><img src="https://i0.hdslb.com/bfs/archive/BV1mdxN68E7F.jpg"><div class="bili-watch-later" style="position:absolute;top:8px;right:8px;width:28px;height:28px"></div></div><h3 class="bili-video-card__info--tit">其他无关搜索视频</h3></a><span class="bili-video-card__info--author">测试UP</span></div></div>
+    <div class="video-list-item"><div class="bili-video-card" data-k="s2"><a href="https://www.bilibili.com/video/BV1kuxM6bE2A/"><div class="bili-video-card__image"><img src="https://i0.hdslb.com/bfs/archive/BV1kuxM6bE2A.jpg"></div><h3 class="bili-video-card__info--tit">映间搜索测试目标</h3></a><span class="bili-video-card__info--author">测试UP</span></div></div>
+  </div></div></div></div></body></html>`;
+  await context.route('https://search.bilibili.com/**', route => route.fulfill({
+    status: 200,
+    contentType: 'text/html; charset=utf-8',
+    body: searchFixture,
+  }));
+  await page.goto('https://search.bilibili.com/video?keyword=%E6%98%A0%E9%97%B4%E6%90%9C%E7%B4%A2%E6%B5%8B%E8%AF%95%E7%9B%AE%E6%A0%87', { waitUntil: 'domcontentloaded' });
+  const searchCard = page.locator('.bili-video-card[data-k="s1"]');
+  await searchCard.waitFor();
+  await searchCard.hover();
+  const searchPlay = searchCard.locator('.margin-search-play');
+  await searchPlay.waitFor({ state: 'visible' });
+  const [playRect, laterRect] = await Promise.all([
+    searchPlay.boundingBox(),
+    searchCard.locator('.bili-watch-later').boundingBox(),
+  ]);
+  assert(playRect && laterRect && playRect.x + playRect.width <= laterRect.x - 4,
+    `search play button overlaps native watch-later: play=${JSON.stringify(playRect)} later=${JSON.stringify(laterRect)}`);
+  await searchPlay.click();
+  const searchLayer = page.locator('#margin-watch-top .vm-layer');
+  await searchLayer.waitFor({ state: 'visible' });
+  await page.waitForTimeout(300);
+  assert(page.url().startsWith('https://search.bilibili.com/video'), `search page navigated away: ${page.url()}`);
+  await searchLayer.locator('.vm-ctrl-min').click();
+  await page.waitForTimeout(450);
+  assert.equal(await searchLayer.getAttribute('data-state'), 'minimized');
+  await searchLayer.locator('.vm-mini-title').waitFor({ state: 'visible' });
+  await page.screenshot({ path: join(out, 'search-mini.png') });
+  await searchLayer.locator('.vm-ctrl-close').click();
+  assert.equal(await searchLayer.getAttribute('data-state'), 'closed');
+
+  // Verify exact-first projection view also gets hover play button
+  await page.locator('#margin-search-exact input').check();
+  const exactCard = page.locator('#margin-search-exact-results li').first();
+  await exactCard.waitFor();
+  await exactCard.hover();
+  const exactPlay = exactCard.locator('.margin-search-play');
+  await exactPlay.waitFor({ state: 'visible' });
+  await exactPlay.click();
+  await searchLayer.waitFor({ state: 'visible' });
+  assert.equal(await searchLayer.getAttribute('data-state'), 'open');
+  await searchLayer.locator('.vm-ctrl-close').click();
+  await page.unroute('https://search.bilibili.com/**');
+  results.push({ name: 'search-card-play-opens-and-minimizes', ok: true });
+  console.log('PASS search-card-play-opens-and-minimizes');
 } finally {
   writeFileSync(join(out, 'results.json'), JSON.stringify({ results, errors }, null, 2));
   await context.close();

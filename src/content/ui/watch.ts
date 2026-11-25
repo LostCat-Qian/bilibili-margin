@@ -21,6 +21,7 @@ import { skinComments } from './comment-skin';
 import css from '../styles/index';
 import { mountUpdateNotice } from './update-notice';
 import { mountSearchControls } from './search-controls';
+import { mountSearchPlayButtons } from './search-play';
 import { attachNavigationGlass } from './navigation-glass';
 import { BackgroundLayer } from '../bg/background';
 import { startTriple } from './triple';
@@ -148,7 +149,10 @@ export class WatchSkin {
       });
       mountUpdateNotice(this.app);
     }
-    if (kind === 'search') mountSearchControls();
+    if (kind === 'search') {
+      mountSearchControls();
+      mountSearchPlayButtons();
+    }
     if (isWatch) { skinComments(); alignAuthorCard(); }
     const lg = filtersIn(root);
     if (!inModal) attachNavigationGlass(this.head, lg);
@@ -192,6 +196,7 @@ export class WatchSkin {
     }
     if (inModal) this.host.hidden = true;
     de.append(this.host);
+    this.applyTheme(false);
     this.media.addEventListener('change', () => this.applyTheme(false));
     // 搜索页没有播放器；普通视频、番剧、列表等换皮页都运行播放器相关设置
     if (kind !== 'search') this.watchScreen();
