@@ -4,6 +4,12 @@
 
 新条目按「新增」「改进」「修复」归类，参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。版本标题链接到对应的 GitHub Release。扩展的显示版本和包内更新版本分别记录，包内版本持续递增。
 
+## 未发布
+
+### 修复
+
+- 动态评论区里的配图改为页内查看器打开，点空白或按 Esc 关闭，和正文配图一致；此前会新开标签页直接打开原图。
+
 ## [v0.6.109](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.109) · 2026-11-24 · 稍后再看续播、动态切换与设置联动
 
 ### 新增

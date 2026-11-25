@@ -210,7 +210,12 @@ function replyRow(r: Reply, ownerMid: number, type: number, oid: string, onReply
       ownerMid > 0 && r.mid === ownerMid ? h('span', { class: 'dy-r-tag dy-r-up', 'aria-label': '动态作者' }, 'UP') : null,
       r.top ? h('span', { class: 'dy-r-tag dy-r-top' }, '置顶') : null,
       h('p', {}, ...richText(r.text, r.richText)),
-      ...(r.pictures ?? []).map(url => h('a', { href: url, ...ext }, img(url, 160))),
+      // 评论配图和正文图一样在页内打开查看器；中键 / Ctrl 点仍按链接新标签打开原图
+      ...(r.pictures ?? []).map((url, i) => {
+        const a = h('a', { href: url, 'aria-label': `查看评论第 ${i + 1} 张图`, ...ext }, img(url, 160));
+        a.addEventListener('click', (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); e.stopPropagation(); openLightbox(r.pictures!, i, a.getRootNode()); });
+        return a;
+      }),
       h('span', { class: 'dy-r-meta' }, [fmtAgo(r.ts), r.location].filter(Boolean).join(' · '), like,
         h('button', { type: 'button', class: 'dy-r-reply', 'aria-label': `回复 ${r.name}`, onclick: onReply }, '回复'))));
 }

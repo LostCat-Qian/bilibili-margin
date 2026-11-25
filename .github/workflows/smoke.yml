@@ -38,6 +38,7 @@ jobs:
         run: |
           node tests/favorites-loading.mjs
           node tests/dynamic-inline-comments.mjs
+          node tests/dynamic-reply-pictures.mjs
           node tests/dynamic-inline-reply.mjs
           node tests/dynamic-composer-extension.mjs
       - name: Folder pocket optics and cover-independent labels
