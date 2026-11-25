@@ -8,7 +8,7 @@ import { installMocks } from './mocks.mjs';
 const ext=resolve(process.env.SMOKE_EXT || 'dist'),out=resolve(process.env.SMOKE_OUT || 'delivery/continuous-corners');
 mkdirSync(out,{recursive:true});
 const context=await chromium.launchPersistentContext(mkdtempSync(join(tmpdir(),'margin-corners-')),{
-  executablePath:process.env.CHROMIUM_PATH || 'C:/Users/asus/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe',
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : { channel: 'chromium' }),
   headless:true,viewport:{width:1440,height:1000},args:[`--disable-extensions-except=${ext}`,`--load-extension=${ext}`],
 });
 const results=[];
