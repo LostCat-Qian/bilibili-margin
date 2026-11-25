@@ -25,7 +25,10 @@ try {
     const downloaded = page.waitForEvent('download', { timeout: 3000 });
     await settings.getByRole('button', { name: '导出', exact: true }).click();
     const file = await downloaded;
-    assert.match(file.suggestedFilename(), /margin-backup-0\.6\.\d+-\d{4}-\d{2}-\d{2}\.json/);
+    const manifest = JSON.parse(readFileSync(join(ext, 'manifest.json'), 'utf8'));
+    const filename = /^margin-backup-(.+)-(\d{4}-\d{2}-\d{2})\.json$/.exec(file.suggestedFilename());
+    assert.ok(filename, file.suggestedFilename());
+    assert.equal(filename[1], manifest.version_name || manifest.version);
     const body = JSON.parse(readFileSync(await file.path(), 'utf8'));
     assert.equal(body.app, 'margin'); assert.equal(body.format, 1); assert.equal(body.settings.theme, 'dark');
     assert.equal(await file.failure(), null);
