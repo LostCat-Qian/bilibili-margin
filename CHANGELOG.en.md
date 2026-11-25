@@ -11,6 +11,7 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 - Improve text contrast on unvoted head-to-head polls in dark video comments while preserving the native result colors.
 - Keep interactive controls visible alongside the triple-action animation, including Bili-Mux when it mounts its download button inside a toolbar item.
 - Pictures in dynamic-post comments now open in the in-page viewer and close on the backdrop or with Esc, matching the post's own pictures; previously they opened the raw image in a new tab.
+- Jumping to the comments on a video page (the Comments command or the `#comment` anchor) now lands below the fixed 72px header; previously the comments heading and input box ended up underneath it.
 
 ## [v0.6.109](https://github.com/jiuyang5354/bilibili-margin/releases/tag/v0.60.109) · 2026-11-24 · Watch Later resume, feed navigation and settings
 
