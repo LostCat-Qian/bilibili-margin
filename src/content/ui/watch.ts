@@ -1,7 +1,7 @@
 import { every } from '../sched';
 import type { Settings } from '../../shared/settings';
 import { loadSettings } from '../../shared/settings';
-import { h, ICONS, guardTyping } from './dom';
+import { h, icon, ICONS, guardTyping } from './dom';
 import { toast } from './controls';
 import { addWatchLater } from '../api/search';
 import { resumeWatchLater } from '../api/watchlater-resume';
@@ -128,7 +128,9 @@ export class WatchSkin {
       { label: '宽屏模式', en: 'Wide Mode', run: () => click('.bpx-player-ctrl-wide') },
       { label: '收藏夹', en: 'Favorites', run: () => this.fav.open() },
     ]) : null;
-    this.app = h('div', { class: 'app wt', 'data-bg': 'off','data-glass':settings.glass,'data-kind':kind }, this.head.el, quick?.el ?? null, createScrollRuler(), this.panel.sheet.el, this.fav.el, palette.el, later.el, cm.el);
+    const backTop = kind === 'search' ? h('button', { type: 'button', class: 'page-back-top', hidden: true, 'aria-label': '返回顶部',
+      onclick: () => window.scrollTo({ top: 0, behavior: reducedMotion() ? 'instant' : 'smooth' }) }, icon(ICONS.arrowUp)) : undefined;
+    this.app = h('div', { class: 'app wt', 'data-bg': 'off','data-glass':settings.glass,'data-kind':kind }, this.head.el, quick?.el ?? null, createScrollRuler(backTop), backTop ?? null, this.panel.sheet.el, this.fav.el, palette.el, later.el, cm.el);
     // 标记抽屉状态；大面板使用实底，可见背景保持动态。
     this.app.addEventListener('margin:sheet', () => { const on = !!this.app.querySelector('.sheet-layer[data-open="true"]'); this.app.classList.toggle('sheeted', on); });
     root.append(this.app);

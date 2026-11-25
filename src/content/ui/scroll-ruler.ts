@@ -9,7 +9,7 @@ import { uiReducedMotion as reducedMotion } from '../motion';
  */
 const COUNT = 51, MAJOR = 5, GAP = 5;
 
-export function createScrollRuler(): HTMLElement {
+export function createScrollRuler(backTop?: HTMLButtonElement): HTMLElement {
   const ticks = Array.from({ length: COUNT }, (_, i) => h('i', { class: i % MAJOR === 0 ? 'major' : '', style: `--d:${i * 8}ms` }));
   const ind = h('b', { class: 'sr-ind' });
   const pct = h('span', { class: 'sr-pct' }, '0%');
@@ -40,6 +40,12 @@ export function createScrollRuler(): HTMLElement {
     raf = requestAnimationFrame(tick);
   };
   const update = () => {
+    // 搜索结果可溢出固定高度的 body；列表增长时 body 的 ResizeObserver 不一定触发。
+    if (backTop) {
+      measure();
+      const hidden = scrollY < innerHeight;
+      if (backTop.hidden !== hidden) backTop.hidden = hidden;
+    }
     const p = progress();
     target = p * H;
     const label = `${Math.round(p * 100)}%`;
@@ -60,10 +66,11 @@ export function createScrollRuler(): HTMLElement {
   el.addEventListener('pointerenter', () => { clearTimeout(idle); el.dataset.on = 'true'; });
   el.addEventListener('pointerleave', () => show());
   // 点刻度跳过去；按住上下拖动连续滚动（v0.47，评论区：刻度条只能单点不能拖）
-  const at = (clientY: number, r: DOMRect) => Math.min(1, Math.max(0, (clientY - r.top) / H));
+  const at = (clientY: number, r: DOMRect) => Math.min(1, Math.max(0, (clientY - r.top) / r.height));
   let drag: DOMRect | null = null, moved = false;
   track.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
+    measure();
     drag = track.getBoundingClientRect(); moved = false;
     track.setPointerCapture(e.pointerId);
     el.dataset.drag = 'true';

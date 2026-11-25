@@ -48,6 +48,26 @@ try {
   assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollPaddingTop), 'auto', 'no reservation while the header is hidden in web fullscreen');
   await page.evaluate(() => document.documentElement.classList.remove('margin-webscreen'));
   results.push('web fullscreen keeps the reservation off while the header is hidden');
+  await page.goto('https://search.bilibili.com/all?keyword=test');
+  const track = page.locator('#margin-watch-top .sr-track');
+  await track.waitFor({ state: 'attached' });
+  await page.evaluate(() => {
+    document.body.style.height = '100vh';
+    const results = document.createElement('div');
+    document.body.append(results);
+    results.style.height = '400vh';
+    scrollTo(0, innerHeight + 100);
+  });
+  const back = page.getByRole('button', { name: '返回顶部', exact: true });
+  await back.waitFor();
+  assert(parseInt(await page.locator('#margin-watch-top .sr-pct').textContent()) > 0);
+  const bounds = await track.boundingBox();
+  await track.click({ position: { x: 6, y: bounds.height * .85 } });
+  await page.waitForFunction(() => scrollY / (document.documentElement.scrollHeight - innerHeight) > .8);
+  await back.click();
+  await page.waitForFunction(() => scrollY === 0);
+  assert(await back.isHidden());
+  results.push('search result overflow updates the ruler, accepts a jump and returns to the top');
   assert.deepEqual(errors, []);
   results.forEach((result) => console.log('PASS ' + result));
 } finally {

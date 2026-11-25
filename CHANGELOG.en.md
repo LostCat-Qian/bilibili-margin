@@ -6,8 +6,13 @@ New entries are grouped under Added, Changed, and Fixed, following [Keep a Chang
 
 ## Unreleased
 
+### Added
+
+- Search results show a back-to-top button in the lower right after scrolling one screen.
+
 ### Fixed
 
+- Keep the search scroll ruler in sync as results grow so clicks and drags reach the indicated position.
 - Improve text contrast on unvoted head-to-head polls in dark video comments while preserving the native result colors.
 - Keep interactive controls visible alongside the triple-action animation, including Bili-Mux when it mounts its download button inside a toolbar item.
 - Pictures in dynamic-post comments now open in the in-page viewer and close on the backdrop or with Esc, matching the post's own pictures; previously they opened the raw image in a new tab.
